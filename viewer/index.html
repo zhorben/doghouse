@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D-модель зимней будки 1150×750 мм (Телеханы)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #141b24; color: #f1f5f9; overflow: hidden; }
+    #panel {
+      position: fixed; top: 16px; left: 16px; width: 340px;
+      background: rgba(20, 29, 43, 0.92); border: 1px solid #334155;
+      border-radius: 12px; padding: 16px; z-index: 10;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+    }
+    h1 { font-size: 17px; margin-bottom: 6px; color: #fbbf24; }
+    p.sub { font-size: 12.5px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4; }
+    .group-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #60a5fa; margin: 10px 0 6px; letter-spacing: 0.04em; }
+    label.toggle { display: flex; align-items: center; gap: 8px; font-size: 13.5px; margin: 5px 0; cursor: pointer; }
+    input[type="checkbox"] { width: 16px; height: 16px; accent-color: #fbbf24; cursor: pointer; }
+    .slider-row { margin-top: 8px; }
+    .slider-row span { font-size: 13px; display: block; margin-bottom: 4px; }
+    input[type="range"] { width: 100%; accent-color: #ef4444; cursor: pointer; }
+    .swatch { display: inline-block; width: 13px; height: 13px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.4); }
+    .hint { margin-top: 12px; font-size: 12px; color: #cbd5e1; background: #1e293b; padding: 8px 10px; border-radius: 8px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div id="panel">
+    <h1>Зимняя будка 1150×750 мм</h1>
+    <p class="sub">Каркас: брус 50×50 мм · Утеплитель: Пеноплэкс 50 мм · Внутри: фанера 10 мм · Снаружи: вагонка 16 мм</p>
+
+    <div class="group-title">Открывание крыши на петлях</div>
+    <div class="slider-row">
+      <span id="roofAngleLabel">Угол подъема крыши: 25°</span>
+      <input id="roofSlider" type="range" min="0" max="75" value="25" />
+    </div>
+
+    <div class="group-title">Слои конструкции (вкл/выкл)</div>
+    <label class="toggle"><input type="checkbox" id="chkFrame" checked /><span class="swatch" style="background:#eab676"></span>Каркас из бруса 50×50 мм + лыжи</label>
+    <label class="toggle"><input type="checkbox" id="chkPlywood" checked /><span class="swatch" style="background:#f3dfa2"></span>Внутренняя фанера 10 мм и пол</label>
+    <label class="toggle"><input type="checkbox" id="chkFoam" checked /><span class="swatch" style="background:#ff9f43"></span>Пеноплэкс 50 мм (утеплитель)</label>
+    <label class="toggle"><input type="checkbox" id="chkVagonka" /><span class="swatch" style="background:#c98a4b"></span>Наружная вагонка 16 мм + уголки</label>
+    <label class="toggle"><input type="checkbox" id="chkRoof" checked /><span class="swatch" style="background:#b91c1c"></span>Откидная крыша с теплой пробкой</label>
+
+    <div class="hint">
+      <b>Управление мышкой / трекпадом:</b><br/>
+      • Зажать левую кнопку — вращать 3D-модель<br/>
+      • Колесико / щипок — приблизить / отдалить<br/>
+      • Зажать правую кнопку — сдвинуть камеру
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x141b24);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 15000);
+    camera.position.set(1900, 1550, 2200);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 420, 0);
+    controls.update();
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight.position.set(1500, 2500, 1800);
+    scene.add(dirLight);
+
+    const grid = new THREE.GridHelper(3000, 30, 0x334155, 0x1e293b);
+    scene.add(grid);
+
+    const groupFrame = new THREE.Group();
+    const groupPlywood = new THREE.Group();
+    const groupFoam = new THREE.Group();
+    const groupVagonka = new THREE.Group();
+    const roofPivot = new THREE.Group();
+    roofPivot.position.set(0, 770, -425);
+
+    scene.add(groupFrame, groupPlywood, groupFoam, groupVagonka, roofPivot);
+
+    const matTimber = new THREE.MeshStandardMaterial({ color: 0xeab676, roughness: 0.7 });
+    const matSkid = new THREE.MeshStandardMaterial({ color: 0xa66e38, roughness: 0.8 });
+    const matPlywood = new THREE.MeshStandardMaterial({ color: 0xf3dfa2, roughness: 0.65 });
+    const matFoam = new THREE.MeshStandardMaterial({ color: 0xff9f43, roughness: 0.5, transparent: true, opacity: 0.88 });
+    const matVagonka = new THREE.MeshStandardMaterial({ color: 0xc98a4b, roughness: 0.7 });
+    const matRoofTop = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.8 });
+    const matEdge = new THREE.LineBasicMaterial({ color: 0x1e293b });
+
+    function addBox(parent, w, h, d, cx, cy, cz, mat) {
+      const geom = new THREE.BoxGeometry(w, h, d);
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.set(cx, cy, cz);
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geom), matEdge);
+      mesh.add(edges);
+      parent.add(mesh);
+      return mesh;
+    }
+
+    for (const sx of [-600, -200, 600]) {
+      addBox(groupFrame, 50, 50, 850, sx, 25, 0, matSkid);
+    }
+
+    addBox(groupPlywood, 1250, 10, 850, 0, 55, 0, matPlywood);
+
+    addBox(groupFrame, 1250, 50, 50, 0, 85, -400, matTimber);
+    addBox(groupFrame, 1250, 50, 50, 0, 85, 400, matTimber);
+    for (const jx of [-600, -200, 200, 600]) {
+      addBox(groupFrame, 50, 50, 750, jx, 85, 0, matTimber);
+    }
+    for (const fx of [-400, 0, 400]) {
+      addBox(groupFoam, 350, 50, 750, fx, 85, 0, matFoam);
+    }
+
+    addBox(groupPlywood, 1250, 10, 850, 0, 115, 0, matPlywood);
+
+    const floorTop = 120;
+
+    addBox(groupFrame, 1250, 50, 50, 0, floorTop + 25, 400, matTimber);
+    addBox(groupFrame, 1250, 50, 50, 0, floorTop + 725, 400, matTimber);
+    for (const sx of [-600, -225, 100, 500, 600]) {
+      addBox(groupFrame, 50, 650, 50, sx, floorTop + 375, 400, matTimber);
+    }
+    addBox(groupFrame, 350, 50, 50, 300, floorTop + 525, 400, matTimber);
+
+    addBox(groupFoam, 325, 650, 50, -412.5, floorTop + 375, 400, matFoam);
+    addBox(groupFoam, 275, 650, 50, -62.5, floorTop + 375, 400, matFoam);
+    addBox(groupFoam, 350, 150, 50, 300, floorTop + 625, 400, matFoam);
+    addBox(groupFoam, 50, 650, 50, 550, floorTop + 375, 400, matFoam);
+
+    addBox(groupFrame, 1250, 50, 50, 0, floorTop + 25, -400, matTimber);
+    addBox(groupFrame, 1250, 50, 50, 0, floorTop + 625, -400, matTimber);
+    for (const sx of [-600, -200, 200, 600]) {
+      addBox(groupFrame, 50, 550, 50, sx, floorTop + 325, -400, matTimber);
+    }
+    for (const fx of [-400, 0, 400]) {
+      addBox(groupFoam, 350, 550, 50, fx, floorTop + 325, -400, matFoam);
+    }
+
+    for (const sideX of [-600, 600]) {
+      addBox(groupFrame, 50, 50, 750, sideX, floorTop + 25, 0, matTimber);
+      addBox(groupFrame, 50, 550, 50, sideX, floorTop + 325, -350, matTimber);
+      addBox(groupFrame, 50, 600, 50, sideX, floorTop + 350, 0, matTimber);
+      addBox(groupFrame, 50, 650, 50, sideX, floorTop + 375, 350, matTimber);
+      const topBeam = addBox(groupFrame, 50, 50, 757, sideX, floorTop + 675, 0, matTimber);
+      topBeam.rotation.x = Math.atan2(100, 750);
+
+      addBox(groupFoam, 50, 575, 300, sideX, floorTop + 337.5, -175, matFoam);
+      addBox(groupFoam, 50, 625, 300, sideX, floorTop + 362.5, 175, matFoam);
+    }
+
+    addBox(groupPlywood, 1150, 650, 10, 0, floorTop + 325, -370, matPlywood);
+    addBox(groupPlywood, 700, 750, 10, -225, floorTop + 375, 370, matPlywood);
+    addBox(groupPlywood, 350, 250, 10, 300, floorTop + 625, 370, matPlywood);
+    addBox(groupPlywood, 100, 750, 10, 525, floorTop + 375, 370, matPlywood);
+    for (const innerSideX of [-570, 570]) {
+      addBox(groupPlywood, 10, 700, 730, innerSideX, floorTop + 350, 0, matPlywood);
+    }
+
+    addBox(groupVagonka, 1282, 650, 16, 0, floorTop + 325, -433, matVagonka);
+    addBox(groupVagonka, 750, 750, 16, -250, floorTop + 375, 433, matVagonka);
+    addBox(groupVagonka, 350, 250, 16, 300, floorTop + 625, 433, matVagonka);
+    addBox(groupVagonka, 150, 750, 16, 550, floorTop + 375, 433, matVagonka);
+    for (const outerSideX of [-633, 633]) {
+      addBox(groupVagonka, 16, 700, 882, outerSideX, floorTop + 350, 0, matVagonka);
+    }
+
+    const roofAssembly = new THREE.Group();
+    const slopeAngle = Math.atan2(100, 850);
+    roofAssembly.rotation.x = slopeAngle;
+    roofPivot.add(roofAssembly);
+
+    addBox(roofAssembly, 1450, 14, 1050, 0, 12, 445, matRoofTop);
+    addBox(roofAssembly, 1450, 10, 1050, 0, 0, 445, matPlywood);
+
+    addBox(roofAssembly, 1120, 50, 50, 0, -30, 90, matTimber);
+    addBox(roofAssembly, 1120, 50, 50, 0, -30, 760, matTimber);
+    for (const rx of [-535, -180, 180, 535]) {
+      addBox(roofAssembly, 50, 50, 620, rx, -30, 425, matTimber);
+    }
+    for (const rfx of [-357, 0, 357]) {
+      addBox(roofAssembly, 305, 50, 620, rfx, -30, 425, matFoam);
+    }
+    addBox(roofAssembly, 1120, 10, 720, 0, -60, 425, matPlywood);
+
+    function updateRoofAngle(deg) {
+      roofPivot.rotation.x = -THREE.MathUtils.degToRad(deg);
+      document.getElementById("roofAngleLabel").textContent = "Угол подъема крыши: " + deg + "°";
+    }
+    updateRoofAngle(25);
+
+    document.getElementById("roofSlider").addEventListener("input", (e) => updateRoofAngle(Number(e.target.value)));
+    document.getElementById("chkFrame").addEventListener("change", (e) => { groupFrame.visible = e.target.checked; });
+    document.getElementById("chkPlywood").addEventListener("change", (e) => { groupPlywood.visible = e.target.checked; });
+    document.getElementById("chkFoam").addEventListener("change", (e) => { groupFoam.visible = e.target.checked; });
+    document.getElementById("chkVagonka").addEventListener("change", (e) => { groupVagonka.visible = e.target.checked; });
+    document.getElementById("chkRoof").addEventListener("change", (e) => { roofPivot.visible = e.target.checked; });
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
