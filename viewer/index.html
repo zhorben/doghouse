@@ -37,7 +37,7 @@
     </div>
 
     <div class="group-title">Слои конструкции (вкл/выкл)</div>
-    <label class="toggle"><input type="checkbox" id="chkPad" checked /><span class="swatch" style="background:#94a3b8"></span>Сетка от подкопа + 6 опорных плиток</label>
+    <label class="toggle"><input type="checkbox" id="chkPad" checked /><span class="swatch" style="background:#64748b"></span>Стальная сетка от подкопа (200×150 см)</label>
     <label class="toggle"><input type="checkbox" id="chkFrame" checked /><span class="swatch" style="background:#eab676"></span>Каркас 50×50 мм + закрытый цоколь</label>
     <label class="toggle"><input type="checkbox" id="chkPlywood" checked /><span class="swatch" style="background:#f3dfa2"></span>Внутренняя фанера 10 мм и пол</label>
     <label class="toggle"><input type="checkbox" id="chkFoam" checked /><span class="swatch" style="background:#ff9f43"></span>Пеноплэкс 50 мм (утеплитель)</label>
@@ -115,16 +115,10 @@
       return mesh;
     }
 
-    const matPaver = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.9 });
-    const meshGrid = new THREE.GridHelper(2000, 40, 0x64748b, 0x475569);
+    const meshGrid = new THREE.GridHelper(2000, 40, 0x94a3b8, 0x475569);
     meshGrid.scale.z = 0.75;
-    meshGrid.position.y = -28;
+    meshGrid.position.y = -2;
     groupPad.add(meshGrid);
-    for (const px of [-600, 0, 600]) {
-      for (const pz of [-400, 400]) {
-        addBox(groupPad, 300, 30, 300, px, -15, pz, matPaver);
-      }
-    }
 
     addBox(groupFrame, 1250, 50, 50, 0, 25, -400, matSkid);
     addBox(groupFrame, 1250, 50, 50, 0, 25, 400, matSkid);

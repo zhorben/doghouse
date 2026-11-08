@@ -87,12 +87,12 @@ def draw_screw_point(canvas, center_x, center_y, radius=7):
 
 def generate_sheet_one():
     sheet_image, canvas = create_blueprint_sheet(
-        "ПРОЕКТ ЗИМНЕЙ БУДКИ 1150×750 мм (ОПТИМИЗИРОВАННАЯ СМЕТА 429 BYN)",
-        "Брус 50×50 (лесхоз) | Техноплекс 50 мм | Пол: фанера 10 мм, стены внутри: 4 мм | Снаружи: вагонка + наличник ТЗСИ | Крыша: ОСБ-3 + черепица",
+        "ПРОЕКТ ЗИМНЕЙ БУДКИ 1150×750 мм (БЕЗ ПЛИТКИ — СМЕТА 403 BYN)",
+        "Брус 50×50 (лесхоз) | Техноплекс 50 мм | Пол: фанера 10, стены: 4 мм | Вагонка + наличник ТЗСИ | Низ: битумная гидроизоляция + стальная сетка",
         1
     )
 
-    canvas.text((60, 138), "1. ВИД СВЕРХУ (СЕТКА ОТ ПОДКОПА + 6 ОПОРНЫХ ПЛИТОК + СЛОИ СТЕН)", font=bold_font(23), fill=INK_COLOR)
+    canvas.text((60, 138), "1. ВИД СВЕРХУ (СТАЛЬНАЯ СЕТКА В ГРУНТЕ ОТ ПОДКОПА + СЛОИ СТЕН)", font=bold_font(23), fill=INK_COLOR)
     scale = 0.56
     origin_x, origin_y = 225, 290
     frame_width, frame_height = int(1250 * scale), int(850 * scale)
@@ -113,12 +113,7 @@ def generate_sheet_one():
         canvas.line([(mesh_left, gy), (mesh_right, gy)], fill=(205, 214, 224), width=1)
     canvas.text((mesh_left + 12, mesh_top + 8), "Стальная кладочная сетка в земле: 3 карты 0,5×2,0 м (площадь 2000×1500 мм)", font=bold_font(15), fill=INK_COLOR)
 
-    paver_size = int(300 * scale)
-    for px_mm in [-125, 475, 1075]:
-        for py_mm in [-125, 675]:
-            px1 = origin_x + int(px_mm * scale)
-            py1 = origin_y + int(py_mm * scale)
-            canvas.rectangle([px1, py1, px1 + paver_size, py1 + paver_size], fill=PAVER_FILL, outline=INK_COLOR, width=2)
+    canvas.text((mesh_left + 12, mesh_bottom - 26), "Сетка работает без плитки: когти упираются в стальные прутья, подрыть будку невозможно!", font=bold_font(14), fill=ACCENT_GREEN)
 
     canvas.rectangle([origin_x - vagonka_px, origin_y - vagonka_px, origin_x + frame_width + vagonka_px, origin_y + frame_height + vagonka_px], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([origin_x, origin_y, origin_x + frame_width, origin_y + frame_height], fill=PENOPLEX_FILL, outline=INK_COLOR, width=3)
@@ -159,25 +154,22 @@ def generate_sheet_one():
     draw_dimension_arrow(canvas, door_left_x, origin_y + frame_height, door_right_x, origin_y + frame_height, "350 мм (лаз)", 0, 1, offset_distance=48, color=FASTENER_RED)
     draw_dimension_arrow(canvas, door_right_x, origin_y + frame_height, origin_x + frame_width - beam_px, origin_y + frame_height, "100", 0, 1, offset_distance=48, color=DIMENSION_BLUE)
 
-    canvas.text((1090, 138), "2. БОКОВОЙ РАЗРЕЗ (6 ПЛИТОК + СЕТКА + МЯГКАЯ ЧЕРЕПИЦА)", font=bold_font(23), fill=INK_COLOR)
-    section_x, section_y = 1235, 845
+    canvas.text((1090, 138), "2. БОКОВОЙ РАЗРЕЗ (СЕТКА + ГИДРОИЗОЛЯЦИЯ ЦОКОЛЯ)", font=bold_font(23), fill=INK_COLOR)
+    section_x, section_y = 1235, 855
     plinth_height = int(50 * scale)
     ply_height = int(10 * scale)
     floor_height = int(50 * scale)
-    paver_height = int(30 * scale)
 
     paver_top = section_y + ply_height + plinth_height
-    ground_y = paver_top + paver_height
+    ground_y = paver_top + 6
     mesh_left_s = section_x - mesh_margin_y
     mesh_right_s = section_x + frame_height + mesh_margin_y
 
+    canvas.rectangle([section_x - 4, paver_top, section_x + frame_height + 4, ground_y], fill=(45, 45, 50), outline=INK_COLOR, width=1)
     canvas.line([(mesh_left_s - 25, ground_y), (mesh_right_s + 25, ground_y)], fill=ACCENT_GREEN, width=4)
     for dash_m in range(mesh_left_s, mesh_right_s, 14):
         canvas.line([(dash_m, ground_y + 6), (min(dash_m + 9, mesh_right_s), ground_y + 6)], fill=MESH_COLOR, width=4)
-    canvas.text((mesh_left_s, ground_y + 14), "Стальная кладочная сетка в грунте + 6 опорных плиток 300×300×30 мм под цоколем", font=bold_font(15), fill=ACCENT_GREEN)
-
-    canvas.rectangle([section_x - int(60 * scale), paver_top, section_x + int(240 * scale), ground_y], fill=PAVER_FILL, outline=INK_COLOR, width=2)
-    canvas.rectangle([section_x + frame_height - int(240 * scale), paver_top, section_x + frame_height + int(60 * scale), ground_y], fill=PAVER_FILL, outline=INK_COLOR, width=2)
+    canvas.text((mesh_left_s - 10, ground_y + 14), "Стальная сетка в грунте + полосы битумной черепицы (из остатка крыши) под низ цоколя", font=bold_font(14), fill=ACCENT_GREEN)
 
     canvas.rectangle([section_x, section_y + ply_height, section_x + frame_height, paver_top], fill=(235, 220, 195), outline=INK_COLOR, width=2)
     for cross_offset in [0, int(400 * scale), frame_height - beam_px]:
@@ -237,8 +229,8 @@ def generate_sheet_one():
         (TIMBER_FILL, "Брус 50×50 мм (каркас)"),
         (PENOPLEX_FILL, "Пеноплэкс 50 мм (утеплитель)"),
         (PLYWOOD_FILL, "Фанера 10 мм / ОСБ 9 мм"),
-        (VAGONKA_FILL, "Вагонка 16 мм + уголок 40×40"),
-        (PAVER_FILL, "Сетка + 6 плиток 30×30 см")
+        (VAGONKA_FILL, "Вагонка 16 мм + наличник ТЗСИ"),
+        ((205, 214, 224), "Стальная сетка от подкопа")
     ]
     legend_x = 65
     for swatch_color, swatch_label in legend_entries:
@@ -247,12 +239,12 @@ def generate_sheet_one():
         legend_x += 375
 
     assembly_steps = [
-        "ШАГ 0 (Основание): Укладываем на землю 3 карты стальной кладочной сетки 0,5×2,0 м (площадь 200×150 см, присыпаем 2 см песка/земли),",
-        "      а сверху по уровню кладем 6 тротуарных плиток 30×30×3 см (по 2 плитки под левый край, середину и правый край цоколя будки).",
-        "ШАГ 1 (Дно + закрытый цоколь): Скручиваем раму пола 1250×850 мм с Пеноплэксом 50 мм и фанерой 10 мм с двух сторон, а снизу",
-        "      крепим замкнутую рамку-цоколь 50×50 мм без щелей (пропитанную антисептиком). Ставим дно на 6 опорных плиток.",
-        "ШАГ 2–5 (Стенки и крыша): Собираем 4 стенки с фанерой 10 мм внутри, утепляем Пеноплэксом 50 мм, обшиваем вагонкой до низа цоколя,",
-        "      закрываем углы и лаз Г-образным уголком 40×40 мм. Крышу из цельного листа ОСБ-3 9 мм кроем мягкой черепицей и вешаем на 2 петли."
+        "ШАГ 0 (Основание БЕЗ плитки): Укладываем на выровненную землю 3 карты стальной кладочной сетки 0,5×2,0 м (площадь 200×150 см,",
+        "      присыпаем 2–3 см песка, чтобы вода уходила в грунт). Сетка не дает собаке рыть яму — будка никогда не просядет!",
+        "ШАГ 1 (Дно + гидроизоляция цоколя): Скручиваем раму пола 1250×850 мм с утеплителем, снизу крепим закрытый цоколь 50×50 мм.",
+        "      К нижней грани цоколя прибиваем полоски битумной черепицы (бесплатный остаток 1 м² от рулона крыши!) — дерево не намокнет от земли!",
+        "ШАГ 2–5 (Стенки и крыша): Ставим 4 стенки (внутри фанера, в каркасе Техноплекс 50 мм, снаружи вагонка + наличник ТЗСИ на углах)",
+        "      и вешаем на 2 петли откидную крышу из цельного листа ОСБ-3 9 мм, покрытую рулонной черепицей Технониколь."
     ]
     step_y = 1094
     for step_line in assembly_steps:
@@ -305,7 +297,7 @@ def generate_sheet_two():
     canvas.rectangle([55, 695, 955, 835], fill=(255, 255, 255), outline=INK_COLOR, width=2)
     canvas.text((70, 704), "Детали Щита №1 (Рама пола + Закрытый цоколь снизу):", font=bold_font(18), fill=DIMENSION_BLUE)
     canvas.text((70, 732), "• Рама пола (с утеплителем): Д-1 (1250 мм — 2 шт.) + Д-2 (750 мм — 4 шт.).", font=regular_font(16), fill=INK_COLOR)
-    canvas.text((70, 758), "• Закрытый цоколь снизу (опирается на 6 плиток 300×300 мм поверх стальной сетки):", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((70, 758), "• Закрытый цоколь снизу (снизу подбивается полосами битумной черепицы от остатка крыши):", font=bold_font(15), fill=FASTENER_RED)
     canvas.text((70, 782), "  Ц-1 продольные (1250 мм — 2 шт.) + Ц-2 поперечные (750 мм — 3 шт., по краям и центру).", font=regular_font(16), fill=INK_COLOR)
     canvas.text((70, 806), "• Фанера 10 мм: 2 цельных куска по 1250 × 850 мм (черновой пол + чистовой пол).", font=regular_font(16), fill=INK_COLOR)
 
@@ -678,12 +670,12 @@ def generate_sheet_four():
         "7. Наличник деревянный 13×74 мм 2 сорт (ТЗСИ Заводская, 1: 9 м по 2,21 р.) — 19,89 BYN",
         "   • Скручивается Г-образно на 4 внешних угла будки и рамку вокруг лаза.",
         "8. Черепица рулонная Технониколь МИНИ 2,5 м² (Код ОМА 2.252623) — 40,99 BYN",
-        "9. Основание от подкопа (3 карты сетки 0,5×2 м + 6 плиток Код 2.444393) — 55,62 BYN",
+        "   • 1,52 м² идет на крышу, а остаток 0,98 м² режем на полосы под низ цоколя!",
+        "9. Сетка стальная кладочная 0,5×2,0 м от подкопа (3 карты в грунт) — ~30,00 BYN",
         "10. Крепеж и расходники (саморезы, 2 петли, пена, пропитка) — ~42,00 BYN",
         "   • Саморезы 4,5×90 (120 шт.), 3,5×35 (150 шт.), 3,0×25..30 (350 шт.).",
         "   • 2 крепкие дверные петли + 1 баллон пены + 1 л пропитки снаружи.",
-        "",
-        "ИТОГО ПОЛНЫЙ КОМПЛЕКТ (ВСЁ НОВОЕ): 428,68 BYN (экономия 135 BYN!)"
+        "ИТОГО ПОЛНЫЙ КОМПЛЕКТ (БЕЗ ПЛИТКИ, ВСЁ НОВОЕ): 403,06 BYN"
     ]
 
     left_y = 1008
