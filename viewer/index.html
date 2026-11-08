@@ -37,7 +37,8 @@
     </div>
 
     <div class="group-title">Слои конструкции (вкл/выкл)</div>
-    <label class="toggle"><input type="checkbox" id="chkFrame" checked /><span class="swatch" style="background:#eab676"></span>Каркас из бруса 50×50 мм + лыжи</label>
+    <label class="toggle"><input type="checkbox" id="chkPad" checked /><span class="swatch" style="background:#94a3b8"></span>Площадка из плитки от подкопа (+20 см)</label>
+    <label class="toggle"><input type="checkbox" id="chkFrame" checked /><span class="swatch" style="background:#eab676"></span>Каркас 50×50 мм + закрытый цоколь</label>
     <label class="toggle"><input type="checkbox" id="chkPlywood" checked /><span class="swatch" style="background:#f3dfa2"></span>Внутренняя фанера 10 мм и пол</label>
     <label class="toggle"><input type="checkbox" id="chkFoam" checked /><span class="swatch" style="background:#ff9f43"></span>Пеноплэкс 50 мм (утеплитель)</label>
     <label class="toggle"><input type="checkbox" id="chkVagonka" /><span class="swatch" style="background:#c98a4b"></span>Наружная вагонка 16 мм + уголки</label>
@@ -86,6 +87,7 @@
     const grid = new THREE.GridHelper(3000, 30, 0x334155, 0x1e293b);
     scene.add(grid);
 
+    const groupPad = new THREE.Group();
     const groupFrame = new THREE.Group();
     const groupPlywood = new THREE.Group();
     const groupFoam = new THREE.Group();
@@ -93,7 +95,7 @@
     const roofPivot = new THREE.Group();
     roofPivot.position.set(0, 770, -425);
 
-    scene.add(groupFrame, groupPlywood, groupFoam, groupVagonka, roofPivot);
+    scene.add(groupPad, groupFrame, groupPlywood, groupFoam, groupVagonka, roofPivot);
 
     const matTimber = new THREE.MeshStandardMaterial({ color: 0xeab676, roughness: 0.7 });
     const matSkid = new THREE.MeshStandardMaterial({ color: 0xa66e38, roughness: 0.8 });
@@ -113,8 +115,17 @@
       return mesh;
     }
 
-    for (const sx of [-600, -200, 600]) {
-      addBox(groupFrame, 50, 50, 850, sx, 25, 0, matSkid);
+    const matPaver = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.9 });
+    for (let px = -600; px <= 600; px += 400) {
+      for (let pz = -400; pz <= 400; pz += 400) {
+        addBox(groupPad, 394, 30, 394, px, -15, pz, matPaver);
+      }
+    }
+
+    addBox(groupFrame, 1250, 50, 50, 0, 25, -400, matSkid);
+    addBox(groupFrame, 1250, 50, 50, 0, 25, 400, matSkid);
+    for (const sx of [-600, 0, 600]) {
+      addBox(groupFrame, 50, 50, 750, sx, 25, 0, matSkid);
     }
 
     addBox(groupPlywood, 1250, 10, 850, 0, 55, 0, matPlywood);
@@ -206,6 +217,7 @@
     updateRoofAngle(25);
 
     document.getElementById("roofSlider").addEventListener("input", (e) => updateRoofAngle(Number(e.target.value)));
+    document.getElementById("chkPad").addEventListener("change", (e) => { groupPad.visible = e.target.checked; });
     document.getElementById("chkFrame").addEventListener("change", (e) => { groupFrame.visible = e.target.checked; });
     document.getElementById("chkPlywood").addEventListener("change", (e) => { groupPlywood.visible = e.target.checked; });
     document.getElementById("chkFoam").addEventListener("change", (e) => { groupFoam.visible = e.target.checked; });

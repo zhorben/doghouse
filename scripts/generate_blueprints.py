@@ -27,10 +27,11 @@ FASTENER_RED = (210, 40, 40)
 ACCENT_GREEN = (25, 135, 70)
 
 TIMBER_FILL = (235, 195, 135)
-SKID_TIMBER_FILL = (185, 135, 75)
+PLINTH_TIMBER_FILL = (185, 135, 75)
 PLYWOOD_FILL = (245, 228, 185)
 PENOPLEX_FILL = (255, 175, 110)
 VAGONKA_FILL = (215, 165, 105)
+PAVER_FILL = (195, 202, 212)
 
 def create_blueprint_sheet(title_text, subtitle_text, sheet_number):
     width, height = 2000, 1400
@@ -84,18 +85,31 @@ def draw_screw_point(canvas, center_x, center_y, radius=7):
 
 def generate_sheet_one():
     sheet_image, canvas = create_blueprint_sheet(
-        "ПРОЕКТ ЗИМНЕЙ БУДКИ 1150×750 мм (БЕЗ ПЕРЕГОРОДКИ, С ОТКИДНОЙ КРЫШЕЙ)",
-        "Каркас: брус 50×50 мм | Утепление в круг: Пеноплэкс 50 мм | Внутри: фанера 10 мм | Снаружи: вагонка 16 мм + уголки",
+        "ПРОЕКТ ЗИМНЕЙ БУДКИ 1150×750 мм (ЗАКРЫТЫЙ ЦОКОЛЬ + ЗАЩИТА ОТ ПОДКОПА)",
+        "Каркас: брус 50×50 | Утепление: Пеноплэкс 50 мм | Внутри: фанера 10 мм | Снаружи: вагонка 16 мм | Низ: закрытый цоколь на плитке/сетке",
         1
     )
 
-    canvas.text((60, 138), "1. ВИД СВЕРХУ (РАЗРЕЗ ПО СТЕНАМ, КРЫША ПОДНЯТА)", font=bold_font(25), fill=INK_COLOR)
-    scale = 0.62
-    origin_x, origin_y = 185, 255
+    canvas.text((60, 138), "1. ВИД СВЕРХУ (РАЗРЕЗ ПО СТЕНАМ + ПЛОЩАДКА ОТ ПОДКОПА)", font=bold_font(24), fill=INK_COLOR)
+    scale = 0.58
+    origin_x, origin_y = 205, 275
     frame_width, frame_height = int(1250 * scale), int(850 * scale)
     vagonka_px = int(16 * scale)
     beam_px = int(50 * scale)
     plywood_px = int(10 * scale)
+    pad_margin = int(200 * scale)
+
+    canvas.rectangle(
+        [origin_x - pad_margin, origin_y - pad_margin, origin_x + frame_width + pad_margin, origin_y + frame_height + pad_margin],
+        fill=(228, 234, 240),
+        outline=MUTED_TEXT_COLOR,
+        width=2
+    )
+    for grid_px in range(origin_x - pad_margin, origin_x + frame_width + pad_margin, int(400 * scale)):
+        canvas.line([(grid_px, origin_y - pad_margin), (grid_px, origin_y + frame_height + pad_margin)], fill=(195, 205, 215), width=2)
+    for grid_py in range(origin_y - pad_margin, origin_y + frame_height + pad_margin, int(400 * scale)):
+        canvas.line([(origin_x - pad_margin, grid_py), (origin_x + frame_width + pad_margin, grid_py)], fill=(195, 205, 215), width=2)
+    canvas.text((origin_x - pad_margin + 12, origin_y - pad_margin + 8), "Площадка из плитки / кирпича или стальной сетки (1650 × 1250 мм — выступает на 20 см вокруг будки)", font=bold_font(15), fill=MUTED_TEXT_COLOR)
 
     canvas.rectangle([origin_x - vagonka_px, origin_y - vagonka_px, origin_x + frame_width + vagonka_px, origin_y + frame_height + vagonka_px], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([origin_x, origin_y, origin_x + frame_width, origin_y + frame_height], fill=PENOPLEX_FILL, outline=INK_COLOR, width=3)
@@ -111,43 +125,51 @@ def generate_sheet_one():
         canvas.rectangle([origin_x + frame_width - beam_px, origin_y + int(stud_y * scale), origin_x + frame_width, origin_y + int((stud_y + 50) * scale)], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
 
     door_left_x, door_right_x = origin_x + int(750 * scale), origin_x + int(1100 * scale)
-    canvas.rectangle([door_left_x, origin_y + frame_height - beam_px - plywood_px - 4, door_right_x, origin_y + frame_height + vagonka_px + 4], fill=BACKGROUND_COLOR, outline=BACKGROUND_COLOR)
+    canvas.rectangle([door_left_x, origin_y + frame_height - beam_px - plywood_px - 4, door_right_x, origin_y + frame_height + vagonka_px + 4], fill=(228, 234, 240), outline=(228, 234, 240))
     canvas.line([(door_left_x, origin_y + frame_height - beam_px - plywood_px), (door_left_x, origin_y + frame_height + vagonka_px)], fill=INK_COLOR, width=3)
     canvas.line([(door_right_x, origin_y + frame_height - beam_px - plywood_px), (door_right_x, origin_y + frame_height + vagonka_px)], fill=INK_COLOR, width=3)
     for dash_x in range(door_left_x, door_right_x, 16):
         canvas.line([(dash_x, origin_y + frame_height), (min(dash_x + 8, door_right_x), origin_y + frame_height)], fill=FASTENER_RED, width=3)
 
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 48), "ГЛУХОЙ ТЕПЛЫЙ УГОЛ (700 × 750 мм)", font=bold_font(22), fill=ACCENT_GREEN)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 84), "• Ветер из входа сюда НЕ попадает", font=regular_font(19), fill=INK_COLOR)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 114), "• Здесь вместе спят 5 щенят сейчас", font=regular_font(19), fill=INK_COLOR)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 144), "  и 2 средние собаки зимой", font=regular_font(19), fill=INK_COLOR)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 195), "ЧИСТЫЙ РАЗМЕР ВНУТРИ:", font=bold_font(20), fill=INK_COLOR)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 225), "1150 × 750 мм (по каркасу)", font=mono_font(20), fill=DIMENSION_BLUE)
-    canvas.text((origin_x + beam_px + 30, origin_y + beam_px + 255), "1130 × 730 мм (по фанере 10 мм)", font=mono_font(19), fill=MUTED_TEXT_COLOR)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 38), "ГЛУХОЙ ТЕПЛЫЙ УГОЛ (700 × 750 мм)", font=bold_font(21), fill=ACCENT_GREEN)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 72), "• Ветер из входа сюда НЕ попадает", font=regular_font(18), fill=INK_COLOR)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 100), "• Здесь вместе спят 5 щенят сейчас", font=regular_font(18), fill=INK_COLOR)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 128), "  и 2 средние собаки зимой", font=regular_font(18), fill=INK_COLOR)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 175), "ЧИСТЫЙ РАЗМЕР ВНУТРИ:", font=bold_font(19), fill=INK_COLOR)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 202), "1150 × 750 мм (по каркасу)", font=mono_font(19), fill=DIMENSION_BLUE)
+    canvas.text((origin_x + beam_px + 25, origin_y + beam_px + 228), "1130 × 730 мм (по фанере 10 мм)", font=mono_font(18), fill=MUTED_TEXT_COLOR)
 
-    canvas.text((door_left_x + 8, origin_y + frame_height - 115), "ВХОД (ЛАЗ)", font=bold_font(19), fill=FASTENER_RED)
-    canvas.text((door_left_x + 8, origin_y + frame_height - 90), "350 × 450 мм", font=bold_font(19), fill=FASTENER_RED)
-    canvas.text((door_left_x + 8, origin_y + frame_height - 65), "(порог 50 мм)", font=regular_font(17), fill=FASTENER_RED)
+    canvas.text((door_left_x + 6, origin_y + frame_height - 110), "ВХОД (ЛАЗ)", font=bold_font(18), fill=FASTENER_RED)
+    canvas.text((door_left_x + 6, origin_y + frame_height - 86), "350 × 450 мм", font=bold_font(18), fill=FASTENER_RED)
 
-    draw_dimension_arrow(canvas, origin_x, origin_y, origin_x + frame_width, origin_y, "1250 мм (наружный размер каркаса)", 0, -1, offset_distance=45)
-    draw_dimension_arrow(canvas, origin_x + beam_px, origin_y + beam_px, origin_x + frame_width - beam_px, origin_y + beam_px, "1150 мм (внутри между брусками)", 0, 1, offset_distance=28)
-    draw_dimension_arrow(canvas, origin_x, origin_y, origin_x, origin_y + frame_height, "850 мм (каркас)", -1, 0, offset_distance=80)
-    draw_dimension_arrow(canvas, origin_x + frame_width - beam_px, origin_y + beam_px, origin_x + frame_width - beam_px, origin_y + frame_height - beam_px, "750 мм", 1, 0, offset_distance=75)
-    draw_dimension_arrow(canvas, origin_x + beam_px, origin_y + frame_height, door_left_x, origin_y + frame_height, "700 мм (теплый угол)", 0, 1, offset_distance=55, color=ACCENT_GREEN)
-    draw_dimension_arrow(canvas, door_left_x, origin_y + frame_height, door_right_x, origin_y + frame_height, "350 мм (лаз)", 0, 1, offset_distance=55, color=FASTENER_RED)
-    draw_dimension_arrow(canvas, door_right_x, origin_y + frame_height, origin_x + frame_width - beam_px, origin_y + frame_height, "100", 0, 1, offset_distance=55, color=DIMENSION_BLUE)
+    draw_dimension_arrow(canvas, origin_x, origin_y, origin_x + frame_width, origin_y, "1250 мм (каркас будки)", 0, -1, offset_distance=42)
+    draw_dimension_arrow(canvas, origin_x + beam_px, origin_y + beam_px, origin_x + frame_width - beam_px, origin_y + beam_px, "1150 мм (внутри)", 0, 1, offset_distance=24)
+    draw_dimension_arrow(canvas, origin_x, origin_y, origin_x, origin_y + frame_height, "850 мм", -1, 0, offset_distance=62)
+    draw_dimension_arrow(canvas, origin_x + frame_width - beam_px, origin_y + beam_px, origin_x + frame_width - beam_px, origin_y + frame_height - beam_px, "750 мм", 1, 0, offset_distance=65)
+    draw_dimension_arrow(canvas, origin_x + beam_px, origin_y + frame_height, door_left_x, origin_y + frame_height, "700 мм (теплый угол)", 0, 1, offset_distance=48, color=ACCENT_GREEN)
+    draw_dimension_arrow(canvas, door_left_x, origin_y + frame_height, door_right_x, origin_y + frame_height, "350 мм (лаз)", 0, 1, offset_distance=48, color=FASTENER_RED)
+    draw_dimension_arrow(canvas, door_right_x, origin_y + frame_height, origin_x + frame_width - beam_px, origin_y + frame_height, "100", 0, 1, offset_distance=48, color=DIMENSION_BLUE)
 
-    canvas.text((1090, 138), "2. БОКОВОЙ РАЗРЕЗ (УКЛОН КРЫШИ И ПОЛ)", font=bold_font(25), fill=INK_COLOR)
-    section_x, section_y = 1230, 865
-    skid_height = int(50 * scale)
+    canvas.text((1090, 138), "2. БОКОВОЙ РАЗРЕЗ (ЗАКРЫТЫЙ ЦОКОЛЬ + ПЛИТКА)", font=bold_font(24), fill=INK_COLOR)
+    section_x, section_y = 1235, 845
+    plinth_height = int(50 * scale)
     ply_height = int(10 * scale)
     floor_height = int(50 * scale)
+    paver_height = int(35 * scale)
 
-    canvas.line([(section_x - 90, section_y + skid_height + ply_height), (section_x + frame_height + 120, section_y + skid_height + ply_height)], fill=ACCENT_GREEN, width=4)
-    canvas.text((section_x + 60, section_y + skid_height + ply_height + 10), "Земля (зазор 50 мм от сырости за счет 3 лыж)", font=bold_font(18), fill=ACCENT_GREEN)
+    paver_left = section_x - pad_margin
+    paver_right = section_x + frame_height + pad_margin
+    paver_top = section_y + ply_height + plinth_height
+    canvas.rectangle([paver_left, paver_top, paver_right, paver_top + paver_height], fill=PAVER_FILL, outline=INK_COLOR, width=2)
+    for joint_x in range(paver_left + int(250 * scale), paver_right, int(250 * scale)):
+        canvas.line([(joint_x, paver_top), (joint_x, paver_top + paver_height)], fill=INK_COLOR, width=2)
+    canvas.line([(paver_left - 30, paver_top + paver_height), (paver_right + 30, paver_top + paver_height)], fill=ACCENT_GREEN, width=4)
+    canvas.text((paver_left + 15, paver_top + paver_height + 8), "Плитка/кирпич или стальная сетка (+20 см шире будки — защита от подкопа!)", font=bold_font(16), fill=ACCENT_GREEN)
 
-    for skid_offset in [0, int(400 * scale), frame_height - beam_px]:
-        canvas.rectangle([section_x + skid_offset, section_y + ply_height, section_x + skid_offset + beam_px, section_y + ply_height + skid_height], fill=SKID_TIMBER_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([section_x, section_y + ply_height, section_x + frame_height, paver_top], fill=(235, 220, 195), outline=INK_COLOR, width=2)
+    for cross_offset in [0, int(400 * scale), frame_height - beam_px]:
+        canvas.rectangle([section_x + cross_offset, section_y + ply_height, section_x + cross_offset + beam_px, paver_top], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+    canvas.text((section_x + 48, section_y + ply_height + 5), "Закрытый цоколь 50×50 по кругу (без щелей для лап!)", font=bold_font(14), fill=INK_COLOR)
 
     canvas.rectangle([section_x, section_y, section_x + frame_height, section_y + ply_height], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x, section_y - floor_height, section_x + frame_height, section_y], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
@@ -161,13 +183,13 @@ def generate_sheet_one():
     canvas.rectangle([section_x, floor_top_y - back_wall_height, section_x + beam_px, floor_top_y], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x, floor_top_y - beam_px, section_x + beam_px, floor_top_y], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x, floor_top_y - back_wall_height, section_x + beam_px, floor_top_y - back_wall_height + beam_px], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
-    canvas.rectangle([section_x - vagonka_px, floor_top_y - back_wall_height, section_x, floor_top_y + floor_height + ply_height], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([section_x - vagonka_px, floor_top_y - back_wall_height, section_x, paver_top], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x + beam_px, floor_top_y - back_wall_height, section_x + beam_px + ply_height, floor_top_y], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
 
     canvas.rectangle([section_x + frame_height - beam_px, floor_top_y - front_wall_height, section_x + frame_height, floor_top_y], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x + frame_height - beam_px, floor_top_y - beam_px, section_x + frame_height, floor_top_y], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x + frame_height - beam_px, floor_top_y - front_wall_height, section_x + frame_height, floor_top_y - front_wall_height + beam_px], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
-    canvas.rectangle([section_x + frame_height, floor_top_y - front_wall_height, section_x + frame_height + vagonka_px, floor_top_y + floor_height + ply_height], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([section_x + frame_height, floor_top_y - front_wall_height, section_x + frame_height + vagonka_px, paver_top], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([section_x + frame_height - beam_px - ply_height, floor_top_y - front_wall_height, section_x + frame_height - beam_px, floor_top_y], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
 
     canvas.line([(section_x + beam_px, floor_top_y - back_wall_height), (section_x + frame_height - beam_px, floor_top_y - front_wall_height)], fill=INK_COLOR, width=3)
@@ -183,52 +205,52 @@ def generate_sheet_one():
     plug_end_x, plug_end_y = section_x + frame_height - beam_px - ply_height - 4, floor_top_y - front_wall_height
     canvas.polygon([(plug_start_x, plug_start_y), (plug_end_x, plug_end_y), (plug_end_x, plug_end_y + beam_px), (plug_start_x, plug_start_y + beam_px)], fill=PENOPLEX_FILL, outline=INK_COLOR)
 
-    canvas.line([(section_x + 230, plug_start_y + 25), (section_x + 230, plug_start_y + 95)], fill=INK_COLOR, width=2)
-    canvas.text((section_x + 85, plug_start_y + 100), "Крыша-пробка (Пеноплэкс 50 мм)", font=bold_font(18), fill=INK_COLOR)
-    canvas.text((section_x + 85, plug_start_y + 124), "входит внутрь без щелей!", font=regular_font(17), fill=FASTENER_RED)
+    canvas.line([(section_x + 215, plug_start_y + 25), (section_x + 215, plug_start_y + 92)], fill=INK_COLOR, width=2)
+    canvas.text((section_x + 70, plug_start_y + 96), "Крыша-пробка (Пеноплэкс 50 мм)", font=bold_font(17), fill=INK_COLOR)
+    canvas.text((section_x + 70, plug_start_y + 120), "входит внутрь без щелей!", font=regular_font(16), fill=FASTENER_RED)
 
     canvas.ellipse([section_x - 15, floor_top_y - back_wall_height - 10, section_x + 7, floor_top_y - back_wall_height + 12], fill=FASTENER_RED, outline=INK_COLOR, width=2)
     canvas.line([(section_x - 8, floor_top_y - back_wall_height - 8), (section_x - 45, floor_top_y - back_wall_height - 65)], fill=FASTENER_RED, width=3)
-    canvas.text((section_x - 140, floor_top_y - back_wall_height - 110), "2 ПЕТЛИ СЗАДИ\n(крыша поднимается)", font=bold_font(18), fill=FASTENER_RED)
+    canvas.text((section_x - 140, floor_top_y - back_wall_height - 110), "2 ПЕТЛИ СЗАДИ\n(крыша поднимается)", font=bold_font(17), fill=FASTENER_RED)
 
-    draw_dimension_arrow(canvas, section_x, floor_top_y, section_x, floor_top_y - back_wall_height, "650 мм (зад)", -1, 0, offset_distance=75)
-    draw_dimension_arrow(canvas, section_x + frame_height, floor_top_y, section_x + frame_height, floor_top_y - front_wall_height, "750 мм (перед)", 1, 0, offset_distance=80)
-    draw_dimension_arrow(canvas, section_x, section_y + ply_height + skid_height, section_x + frame_height, section_y + ply_height + skid_height, "850 мм (ширина каркаса)", 0, 1, offset_distance=55)
+    draw_dimension_arrow(canvas, section_x, floor_top_y, section_x, floor_top_y - back_wall_height, "650 мм (зад)", -1, 0, offset_distance=70)
+    draw_dimension_arrow(canvas, section_x + frame_height, floor_top_y, section_x + frame_height, floor_top_y - front_wall_height, "750 мм (перед)", 1, 0, offset_distance=75)
+    draw_dimension_arrow(canvas, section_x, paver_top, section_x + frame_height, paver_top, "850 мм (ширина будки)", 0, 1, offset_distance=75)
 
     canvas.rectangle([45, 985, 1955, 1360], fill=(255, 255, 255), outline=INK_COLOR, width=3)
-    canvas.text((65, 1002), "УСТРОЙСТВО «ТЕРМОС-ПИРОГА» БУДКИ И ПОШАГОВЫЙ ПОРЯДОК СБОРКИ:", font=bold_font(24), fill=DIMENSION_BLUE)
+    canvas.text((65, 1002), "УСТРОЙСТВО «ТЕРМОС-ПИРОГА» БУДКИ И ЗАЩИТА ОТ ПОДКОПА:", font=bold_font(24), fill=DIMENSION_BLUE)
 
     legend_entries = [
         (TIMBER_FILL, "Брус 50×50 мм (каркас)"),
         (PENOPLEX_FILL, "Пеноплэкс 50 мм (утеплитель)"),
         (PLYWOOD_FILL, "Фанера 10 мм (внутри и пол)"),
-        (VAGONKA_FILL, "Вагонка 16 мм (снаружи)"),
-        (FASTENER_RED, "Точки вкручивания саморезов")
+        (VAGONKA_FILL, "Вагонка 16 мм (до низа цоколя)"),
+        (PAVER_FILL, "Плитка/сетка от подкопа (+20 см)")
     ]
     legend_x = 65
     for swatch_color, swatch_label in legend_entries:
         canvas.rectangle([legend_x, 1045, legend_x + 34, 1075], fill=swatch_color, outline=INK_COLOR, width=2)
-        canvas.text((legend_x + 44, 1047), swatch_label, font=bold_font(18), fill=INK_COLOR)
+        canvas.text((legend_x + 44, 1047), swatch_label, font=bold_font(17), fill=INK_COLOR)
         legend_x += 375
 
     assembly_steps = [
-        "ШАГ 1 (Дно): Скручиваем раму пола 1250×850 мм из бруса 50×50. Снизу крепим черновую фанеру 10 мм и 3 лыжи. Переворачиваем, кладем Пеноплэкс 50 мм и закрываем сверху фанерой 10 мм.",
-        "ШАГ 2 (Стенки): На ровном полу собираем 4 рамки стен из бруса 50×50 (Переднюю 1250×750 с окном лаза, Заднюю 1250×650 и 2 Боковые шириной 750 мм).",
-        "ШАГ 3 (Коробка): Прикручиваем к рамкам стен внутреннюю фанеру 10 мм, ставим все 4 стенки на платформу пола и стягиваем их между собой и к полу саморезами 4,5×90 мм.",
-        "ШАГ 4 (Утепление и вагонка): Снаружи в ячейки стен плотно вставляем Пеноплэкс 50 мм (стыки проходим пеной), обшиваем снаружи вагонкой и закрываем углы и вход деревянными уголками.",
-        "ШАГ 5 (Крыша): Собираем утепленный щит крыши 1450×1050 мм (с внутренней теплой рамкой 1120×720 мм, которая входит внутрь верха будки как пробка) и крепим сзади на 2 петли."
+        "ШАГ 0 (Основание на земле от подкопа): Выравниваем площадку 165×125 см (на 20 см шире будки с каждой стороны) и укладываем",
+        "      тротуарную плитку / старый кирпич ИЛИ металлическую сетку (рабицу/кладочную сетку). Собака не сможет рыть под краем будки!",
+        "ШАГ 1 (Дно + закрытый цоколь): Скручиваем раму пола 1250×850 мм с Пеноплэксом 50 мм и фанерой 10 мм с двух сторон, а снизу",
+        "      прикручиваем замкнутую рамку-цоколь 50×50 мм без щелей (пропитанную антисептиком/мастикой). Лапа под дно не пролезет!",
+        "ШАГ 2–5 (Стенки и откидная крыша): Ставим 4 стенки, утепляем Пеноплэксом 50 мм, обшиваем вагонкой до самого низа цоколя и вешаем крышу на 2 петли."
     ]
-    step_y = 1098
+    step_y = 1096
     for step_line in assembly_steps:
         canvas.text((65, step_y), step_line, font=regular_font(17), fill=INK_COLOR)
-        step_y += 48
+        step_y += 46
 
     sheet_image.save(os.path.join(PLANS_OUTPUT_DIR, "01_general_view_and_layers.png"))
     return sheet_image
 
 def generate_sheet_two():
     sheet_image, canvas = create_blueprint_sheet(
-        "ЧЕРТЕЖИ КАРКАСА ИЗ БРУСА 50×50 ММ — ЩИТЫ №1 (ДНО), №2 (ПЕРЕД), №3 (ЗАД)",
+        "ЧЕРТЕЖИ КАРКАСА ИЗ БРУСА 50×50 ММ — ЩИТЫ №1 (ДНО + ЦОКОЛЬ), №2 (ПЕРЕД), №3 (ЗАД)",
         "Все резы прямые под 90°! Красные точки — саморезы по дереву 4,5×90 мм (вкручиваются сквозь обвязку в торец стойки)",
         2
     )
@@ -236,15 +258,15 @@ def generate_sheet_two():
     scale = 0.48
     beam_px = int(50 * scale)
 
-    canvas.text((55, 138), "ЩИТ №1: РАМА ПОЛА (1250 × 850 мм) + 3 ЛЫЖИ СНИЗУ", font=bold_font(22), fill=INK_COLOR)
+    canvas.text((55, 138), "ЩИТ №1: РАМА ПОЛА (1250×850) + ЗАКРЫТЫЙ ЦОКОЛЬ СНИЗУ", font=bold_font(22), fill=INK_COLOR)
     floor_x, floor_y = 145, 225
     floor_w, floor_h = int(1250 * scale), int(850 * scale)
 
     canvas.rectangle([floor_x, floor_y, floor_x + floor_w, floor_y + floor_h], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
     canvas.rectangle([floor_x, floor_y, floor_x + floor_w, floor_y + beam_px], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
     canvas.rectangle([floor_x, floor_y + floor_h - beam_px, floor_x + floor_w, floor_y + floor_h], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
-    canvas.text((floor_x + floor_w // 2 - 80, floor_y + 2), "Д-1: 1250 мм", font=bold_font(16), fill=INK_COLOR)
-    canvas.text((floor_x + floor_w // 2 - 80, floor_y + floor_h - beam_px + 2), "Д-1: 1250 мм", font=bold_font(16), fill=INK_COLOR)
+    canvas.text((floor_x + 35, floor_y + 2), "Д-1 / Ц-1: 1250 мм", font=bold_font(15), fill=INK_COLOR)
+    canvas.text((floor_x + 35, floor_y + floor_h - beam_px + 2), "Д-1 / Ц-1: 1250 мм", font=bold_font(15), fill=INK_COLOR)
 
     for joist_offset in [0, 400, 800, 1200]:
         joist_x = floor_x + int(joist_offset * scale)
@@ -267,10 +289,11 @@ def generate_sheet_two():
     draw_dimension_arrow(canvas, floor_x + int(850 * scale), floor_y + floor_h, floor_x + int(1200 * scale), floor_y + floor_h, "350 мм", 0, 1, offset_distance=32, color=ACCENT_GREEN)
 
     canvas.rectangle([55, 695, 955, 835], fill=(255, 255, 255), outline=INK_COLOR, width=2)
-    canvas.text((70, 706), "Детали Щита №1 (Дно) из бруса 50×50 мм:", font=bold_font(19), fill=DIMENSION_BLUE)
-    canvas.text((70, 735), "• Брус Д-1 (продольный): 1250 мм — 2 шт.  |  • Брус Д-2 (поперечный): 750 мм — 4 шт.", font=regular_font(17), fill=INK_COLOR)
-    canvas.text((70, 763), "• Лыжи (прикручиваются снизу под фанеру вдоль Д-2): 850 мм — 3 шт. (по краям и по центру)", font=regular_font(17), fill=INK_COLOR)
-    canvas.text((70, 791), "• Фанера 10 мм: 2 листа по 1250 × 850 мм (один снизу черновой, второй сверху чистовой)", font=regular_font(17), fill=INK_COLOR)
+    canvas.text((70, 704), "Детали Щита №1 (Рама пола + Закрытый цоколь снизу):", font=bold_font(18), fill=DIMENSION_BLUE)
+    canvas.text((70, 732), "• Рама пола (с утеплителем): Д-1 (1250 мм — 2 шт.) + Д-2 (750 мм — 4 шт.).", font=regular_font(16), fill=INK_COLOR)
+    canvas.text((70, 758), "• Закрытый цоколь снизу под черновой фанерой (без щелей для лап и ветра):", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((70, 782), "  Ц-1 продольные (1250 мм — 2 шт.) + Ц-2 поперечные (750 мм — 3 шт., по краям и центру).", font=regular_font(16), fill=INK_COLOR)
+    canvas.text((70, 806), "• Фанера 10 мм: 2 листа по 1250 × 850 мм (черновой пол + чистовой пол).", font=regular_font(16), fill=INK_COLOR)
 
     canvas.text((1045, 138), "ЩИТ №2: ПЕРЕДНЯЯ СТЕНКА С ЛАЗОМ (1250 × 750 мм)", font=bold_font(22), fill=INK_COLOR)
     front_x, front_y = 1145, 225
@@ -526,7 +549,7 @@ def generate_sheet_three():
 
 def generate_sheet_four():
     sheet_image, canvas = create_blueprint_sheet(
-        "КАРТА РАСКРОЯ МАТЕРИАЛОВ (ФАНЕРА 1525×1525, ПЕНОПЛЭКС 1185×585, БРУС)",
+        "КАРТА РАСКРОЯ МАТЕРИАЛОВ (ФАНЕРА 1525×1525, ПЕНОПЛЭКС, 12 БРУСКОВ)",
         "Как расчертить магазинные листы карандашом перед распилом, чтобы хватило ровно 4 листов фанеры и 1 пачки Пеноплэкса",
         4
     )
@@ -573,7 +596,7 @@ def generate_sheet_four():
             canvas.text((x1 + 8, y1 + 10), rect_label, font=bold_font(13), fill=INK_COLOR)
         canvas.text((base_x + sheet_px // 2 - 55, base_y + sheet_px + 6), "1525 × 1525 мм", font=mono_font(14), fill=MUTED_TEXT_COLOR)
 
-    canvas.text((55, 625), "2. КАРТА РАСПИЛА БРУСА 50×50 ММ (11 ШТУК ПО 3000 ММ — ВСЕ 32 ДЕТАЛИ БЕЗ ОСТАТКА):", font=bold_font(22), fill=INK_COLOR)
+    canvas.text((55, 625), "2. КАРТА РАСПИЛА БРУСА 50×50 ММ (12 ШТУК ПО 3000 ММ — ВКЛЮЧАЯ ЗАКРЫТЫЙ ЦОКОЛЬ):", font=bold_font(22), fill=INK_COLOR)
 
     three_meter_bars = [
         ("Брус 3м №1", [(1250, "Д-1 (Дно): 1250"), (1250, "Д-1 (Дно): 1250"), (350, "П-3: 350")]),
@@ -584,9 +607,10 @@ def generate_sheet_four():
         ("Брус 3м №6", [(650, "П-2: 650"), (650, "П-2: 650"), (650, "П-2: 650"), (650, "П-2: 650")]),
         ("Брус 3м №7", [(650, "Б-2: 650"), (650, "Б-2: 650"), (600, "Б-4: 600"), (600, "Б-4: 600")]),
         ("Брус 3м №8", [(550, "З-2: 550"), (550, "З-2: 550"), (550, "З-2: 550"), (550, "З-2: 550"), (550, "Б-3: 550")]),
-        ("Брус 3м №9", [(850, "Лыжа: 850"), (850, "Лыжа: 850"), (850, "Лыжа: 850"), (450, "Остаток")]),
-        ("Брус №10 (Крыша)", [(1120, "К-1 (Крыша): 1120"), (1120, "К-1 (Крыша): 1120"), (620, "К-2: 620")]),
-        ("Брус №11 (Крыша)", [(620, "К-2: 620"), (620, "К-2: 620"), (620, "К-2: 620"), (550, "Б-3: 550"), (590, "Запас")])
+        ("Брус №9 (Цоколь)", [(1250, "Ц-1 (Цоколь): 1250"), (1250, "Ц-1 (Цоколь): 1250"), (500, "Запас")]),
+        ("Брус №10 (Цоколь)", [(750, "Ц-2 (Цоколь): 750"), (750, "Ц-2 (Цоколь): 750"), (750, "Ц-2 (Цоколь): 750"), (550, "Б-3: 550")]),
+        ("Брус №11 (Крыша)", [(1120, "К-1 (Крыша): 1120"), (1120, "К-1 (Крыша): 1120"), (620, "К-2: 620")]),
+        ("Брус №12 (Крыша)", [(620, "К-2: 620"), (620, "К-2: 620"), (620, "К-2: 620"), (1140, "Запас")])
     ]
 
     bar_scale = 0.25
@@ -611,28 +635,28 @@ def generate_sheet_four():
 
     shopping_left_column = [
         "1. Брус 50×50 мм (сухой строганный или обрезной):",
-        "   • 11 штук по 3 метра (всего 33 пог. метра) — 29 деталей каркаса + 3 лыжи.",
+        "   • 12 штук по 3 метра (всего 36 пог. м) — каркас + крыша + закрытый цоколь.",
         "2. Фанера 10 мм (стандартные листы 1525 × 1525 мм):",
         "   • 4 листа (хватает на черновой пол, чистовой пол, 4 стенки изнутри и крышу).",
         "3. Утеплитель ПЕНОПЛЭКС КОМФОРТ 50 мм (листы 1185 × 585 мм):",
         "   • Ровно 1 упаковка (7 или 8 листов, ~5 м²): 3 куска в пол (350×750),",
         "     3 куска в заднюю стенку (350×550), 3 в переднюю, 4 в боковины, 3 в крышу.",
-        "4. Вагонка деревянная (для наружной обшивки 4 стен):",
-        "   • Площадь стен снаружи = 3,6 м² (берем с запасом 4,2 м² — например,",
+        "4. Вагонка деревянная (для наружной обшивки 4 стен до низа цоколя):",
+        "   • Площадь стен снаружи = 3,8 м² (берем с запасом 4,4 м² — например,",
         "     2 пачки евровагонки длиной 2,0–2,5 м или обшивку на Заводской, 1)."
     ]
 
     shopping_right_column = [
-        "5. Деревянный уголок (40×40 мм) или Наличник (с завода ТЗСИ):",
+        "5. Основание против подкопа (на площадку 165 × 125 см под будку):",
+        "   • 12 тротуарных плиток 40×40 см (или старый кирпич) ИЛИ кусок сварной сетки 2×1,5 м.",
+        "6. Деревянный уголок (40×40 мм) или Наличник (с завода ТЗСИ):",
         "   • 4 планки по 2,0–2,2 м (на 4 внешних угла будки и рамку вокруг лаза).",
-        "6. Кровля на крышу (1450 × 1050 мм = 1,55 м²):",
+        "7. Кровля на крышу (1450 × 1050 мм = 1,55 м²) + Крепеж:",
         "   • 1 пачка гибкой черепицы (~3 м²) ИЛИ кусок рубероида / профлиста 1,6×1,2 м.",
-        "7. Крепеж и мелочи (в любом хозмаге или на 21vek.by):",
-        "   • Саморезы желтые 4,5 × 90 мм (для бруса 50×50) — 1 пачка (100 шт.).",
+        "   • Саморезы желтые 4,5 × 90 мм (для бруса 50×50) — 1 пачка (100–120 шт.).",
         "   • Саморезы желтые 3,5 × 35 мм (для фанеры и уголков) — 1 пачка (250–300 шт.).",
         "   • Саморезы тонкие 3,0 × 30 мм или гвоздики (для вагонки) — 200 шт.",
-        "   • Петли дверные/воротные накладные крепкие — 2 шт. (для откидной крыши).",
-        "   • Пена монтажная (1 баллон задуть стыки Пеноплэкса) + пропитка для дерева (1 л)."
+        "   • 2 крепкие дверные петли + 1 баллон монтажной пены + пропитка для дерева/цоколя."
     ]
 
     left_y = 1035
