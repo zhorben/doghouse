@@ -53,7 +53,7 @@ def compute_doghouse_engineering_model(variant_key="main_50mm"):
     subfloor_plywood_thick = 4
     inner_back_plywood_thick = 10
     inner_wall_plywood_thick = 4
-    outer_cladding_thick = 9 if is_budget else 16
+    outer_cladding_thick = 16
 
     interior_frame_length = frame_length - 2 * beam_size
     interior_frame_width = frame_width - 2 * beam_size
@@ -213,12 +213,13 @@ def compute_doghouse_engineering_model(variant_key="main_50mm"):
             {"num": 1, "title": f"Брус {beam_size}×{beam_size} мм в Телеханском лесхозе ({num_3m_bars} шт. по 3 м = {timber_volume_m3:.3f} м³)", "note": "Цех переработки в Телеханах: +375 (1645) 21-4-81, отдел сбыта 21-2-45.", "price": Decimal("22.00")},
             {"num": 2, "title": "Фанера 10 мм (1 лист 1525×1525, Код ОМА 2.114680)", "note": f"Чистовой пол ({frame_length}×{frame_width}) + задняя стенка внутри ({interior_frame_length}×{back_wall_height}).", "price": Decimal("35.44")},
             {"num": 3, "title": "Фанера 4 мм (2 листа 1525×1525, Код ОМА 2.116157 по 17,17 р.)", "note": "Черновой пол снизу, передняя и обе боковые стенки внутри.", "price": Decimal("34.34")},
-            {"num": 4, "title": "Плита ОСБ-3 влагостойкая 9 мм (2 листа 2500×1250, Код ОМА 2.217093 по 28,29 р.)", "note": "Цельная крыша (1450×1050 + подшивка) И наружная обшивка всех 4 стен под покраску!", "price": Decimal("56.58")},
+            {"num": 4, "title": "Плита ОСБ-3 влагостойкая 9 мм (1 лист 2500×1250, Код ОМА 2.217093)", "note": f"Цельный верх крыши ({roof_length}×{roof_width}) + цельная подшивка крыши ({roof_plug_length}×{roof_plug_width}).", "price": Decimal("28.29")},
             {"num": 5, "title": "Утеплитель ТЕХНОПЛЕКС XPS 30 мм (7 листов, Код ОМА 2.255057 по 5,09 р.)", "note": "Экструдированный пенополистирол 30 мм в пол, все 4 стены и крышу (как в видео 7PO74wVwbDE).", "price": Decimal("35.63")},
-            {"num": 6, "title": "Наличник деревянный 13×74 мм 2 сорт (ТЗСИ Заводская, 1: 9 м по 2,21 р.)", "note": "Закрывает 4 внешних угла будки и рамку вокруг окна лаза 350×450 мм.", "price": Decimal("19.89")},
-            {"num": 7, "title": "Рубероид кровельный РКПО-350 15 м² (Код ОМА 2.175257)", "note": "Кровля крыши в 2 слоя + полосы гидроизоляции снизу под закрытый цоколь.", "price": Decimal("31.11")},
-            {"num": 8, "title": "Сетка стальная кладочная 0,5×2,0 м от подкопа (3 карты в грунт)", "note": "Ковер 200×150 см под будку — когти упираются в стальные прутья, подрыть невозможно.", "price": Decimal("30.00")},
-            {"num": 9, "title": "Крепеж, 2 петли, монтажная пена и фасадная краска", "note": "Саморезы 4,5×75 (120 шт.), 3,5×35 (150 шт.), 3,0×25 (300 шт.), 2 петли, пена, краска.", "price": Decimal("38.00")},
+            {"num": 6, "title": "Вагонка сорт С / 2 сорт (3,8 м², Код ОМА 2.444227 / завод ТЗСИ)", "note": "Наружная обшивка всех 4 стен до самого низа закрытого цоколя.", "price": Decimal("74.00")},
+            {"num": 7, "title": "Наличник деревянный 13×74 мм 2 сорт (ТЗСИ Заводская, 1: 9 м по 2,21 р.)", "note": "Скручивается Г-образно на 4 внешних угла будки и рамку вокруг лаза.", "price": Decimal("19.89")},
+            {"num": 8, "title": "Рубероид кровельный РКПО-350 15 м² (Код ОМА 2.175257)", "note": "Кровля крыши в 2 слоя + полосы гидроизоляции снизу под закрытый цоколь.", "price": Decimal("31.11")},
+            {"num": 9, "title": "Сетка стальная кладочная 0,5×2,0 м от подкопа (3 карты в грунт)", "note": "Ковер 200×150 см под будку — когти упираются в стальные прутья, подрыть невозможно.", "price": Decimal("30.00")},
+            {"num": 10, "title": "Крепеж, 2 петли, монтажная пена и пропитка для дерева", "note": "Саморезы 4,5×75 (120 шт.), 3,5×35 (150 шт.), 3,0×25..30 (350 шт.), 2 петли, пена, пропитка.", "price": Decimal("40.00")},
         ]
     else:
         bom_items = [
@@ -364,7 +365,7 @@ def render_all_sheets_and_readme(m):
     FH = m["front_wall_height"]
     BH = m["back_wall_height"]
     is_budget = m["is_budget"]
-    outer_label = "ОСБ-3 9 мм под покраску" if is_budget else "Вагонка 16 мм"
+    outer_label = "Вагонка 16 мм"
     roof_cov_label = "Рубероид РКПО-350 в 2 слоя" if is_budget else "Мягкая черепица Технониколь"
 
     s1_img, d1 = create_blueprint_sheet(
@@ -376,7 +377,7 @@ def render_all_sheets_and_readme(m):
     scale = 0.56
     ox, oy = 225, 290
     fw, fh = int(FL * scale), int(FW * scale)
-    vag_px = int((9 if is_budget else 16) * scale)
+    vag_px = int(16 * scale)
     b_px = int(B * scale)
     ply_px = int(6 * scale)
     mm_x, mm_y = int(250 * scale), int(225 * scale)
@@ -390,7 +391,7 @@ def render_all_sheets_and_readme(m):
     d1.text((m_left + 12, m_top + 8), "Стальная кладочная сетка в земле: 3 карты 0,5×2,0 м (площадь 2000×1500 мм)", font=bold_font(15), fill=INK_COLOR)
     d1.text((m_left + 12, m_bot - 26), "Сетка работает без плитки: когти упираются в стальные прутья, подрыть будку невозможно!", font=bold_font(14), fill=ACCENT_GREEN)
 
-    d1.rectangle([ox - vag_px, oy - vag_px, ox + fw + vag_px, oy + fh + vag_px], fill=OSB_FILL if is_budget else VAGONKA_FILL, outline=INK_COLOR, width=2)
+    d1.rectangle([ox - vag_px, oy - vag_px, ox + fw + vag_px, oy + fh + vag_px], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([ox, oy, ox + fw, oy + fh], fill=PENOPLEX_FILL, outline=INK_COLOR, width=3)
     d1.rectangle([ox + b_px, oy + b_px, ox + fw - b_px, oy + fh - b_px], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([ox + b_px + ply_px, oy + b_px + ply_px, ox + fw - b_px - ply_px, oy + fh - b_px - ply_px], fill=(255, 252, 242), outline=INK_COLOR, width=3)
@@ -466,13 +467,13 @@ def render_all_sheets_and_readme(m):
     d1.rectangle([sx0, fl_top - hb_px, sx0 + b_px, fl_top], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0, fl_top - b_px, sx0 + b_px, fl_top], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0, fl_top - hb_px, sx0 + b_px, fl_top - hb_px + b_px], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
-    d1.rectangle([sx0 - vag_px, fl_top - hb_px, sx0, paver_top], fill=OSB_FILL if is_budget else VAGONKA_FILL, outline=INK_COLOR, width=2)
+    d1.rectangle([sx0 - vag_px, fl_top - hb_px, sx0, paver_top], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0 + b_px, fl_top - hb_px, sx0 + b_px + ply_h, fl_top], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
 
     d1.rectangle([sx0 + fh - b_px, fl_top - hf_px, sx0 + fh, fl_top], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0 + fh - b_px, fl_top - b_px, sx0 + fh, fl_top], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0 + fh - b_px, fl_top - hf_px, sx0 + fh, fl_top - hf_px + b_px], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
-    d1.rectangle([sx0 + fh, fl_top - hf_px, sx0 + fh + vag_px, paver_top], fill=OSB_FILL if is_budget else VAGONKA_FILL, outline=INK_COLOR, width=2)
+    d1.rectangle([sx0 + fh, fl_top - hf_px, sx0 + fh + vag_px, paver_top], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     d1.rectangle([sx0 + fh - b_px - ply_h, fl_top - hf_px, sx0 + fh - b_px, fl_top], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
     d1.line([(sx0 + b_px, fl_top - hb_px), (sx0 + fh - b_px, fl_top - hf_px)], fill=INK_COLOR, width=3)
 
@@ -504,7 +505,7 @@ def render_all_sheets_and_readme(m):
         (TIMBER_FILL, f"Брус {B}×{B} мм (каркас)"),
         (PENOPLEX_FILL, f"Техноплекс {m['foam_thickness']} мм"),
         (PLYWOOD_FILL, "Фанера 10 / 4 мм + ОСБ 9"),
-        (OSB_FILL if is_budget else VAGONKA_FILL, f"{outer_label}"),
+        (VAGONKA_FILL, f"{outer_label} + наличник ТЗСИ"),
         ((205, 214, 224), "Стальная сетка от подкопа")
     ]
     lx = 65
@@ -827,7 +828,7 @@ def render_all_sheets_and_readme(m):
         "Автоматическая 1D/2D раскладка Python: каждая деталь проверяется assert-условиями без наложений и перерасхода",
         4
     )
-    d4.text((55, 136), f"1. РАСКРОЙ ФАНЕРЫ (1 ЛИСТ 10 ММ + 2 ЛИСТА 4 ММ) И {'2 ЛИСТОВ' if is_budget else '1 ЛИСТА'} ОСБ-3 9 ММ (2500×1250):", font=bold_font(21), fill=INK_COLOR)
+    d4.text((55, 136), "1. РАСКРОЙ ФАНЕРЫ (1 ЛИСТ 10 ММ + 2 ЛИСТА 4 ММ) И 1 ЛИСТА ОСБ-3 9 ММ (2500×1250):", font=bold_font(21), fill=INK_COLOR)
 
     psc = 0.24
     ply_layouts = [
@@ -1001,8 +1002,8 @@ def render_all_sheets_and_readme(m):
     d5.rectangle([cx + b_u, cy + b_u + p4_u, cx + b_u + p4_u, cy + 340], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
     d5.text((cx + b_u + 30, cy + b_u + 18), "Внутренняя фанера 4 мм (стык в углу под 90°)", font=bold_font(15), fill=ACCENT_GREEN)
 
-    d5.rectangle([cx - v_u, cy - v_u, cx + 380, cy], fill=OSB_FILL if is_budget else VAGONKA_FILL, outline=INK_COLOR, width=2)
-    d5.rectangle([cx - v_u, cy, cx, cy + 340], fill=OSB_FILL if is_budget else VAGONKA_FILL, outline=INK_COLOR, width=2)
+    d5.rectangle([cx - v_u, cy - v_u, cx + 380, cy], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
+    d5.rectangle([cx - v_u, cy, cx, cy + 340], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
     d5.text((cx + 150, cy - v_u + 8), f"{outer_label} снаружи", font=bold_font(14), fill=INK_COLOR)
 
     d5.rectangle([cx - v_u - n_t, cy - v_u - n_t, cx - v_u - n_t + n_w, cy - v_u], fill=TIMBER_FILL, outline=FASTENER_RED, width=3)
@@ -1065,7 +1066,7 @@ def generate_readme_markdown(m):
     FH = m["front_wall_height"]
     BH = m["back_wall_height"]
     is_budget = m["is_budget"]
-    variant_title = "Бюджетная версия 30 мм + ОСБ снаружи" if is_budget else "Основная версия 50 мм + вагонка снаружи"
+    variant_title = "Бюджетная версия 30 мм + вагонка снаружи" if is_budget else "Основная версия 50 мм + вагонка снаружи"
     bt = chr(96)
     lines = [
         f"# Проект зимней утепленной будки {IL}×{IW} мм — {variant_title} ({m['total_cost_byn']} BYN)",
@@ -1074,7 +1075,7 @@ def generate_readme_markdown(m):
         ">",
         "> **Две ветки в репозитории:**",
         f"> * Ветка **{bt}main{bt}** — Основная версия (каркас {bt}50×50 мм{bt}, утеплитель Техноплекс {bt}50 мм{bt}, снаружи деревянная вагонка + наличник ТЗСИ, мягкая черепица): **{bt}403,06 BYN{bt}**.",
-        f"> * Ветка **{bt}budget-30mm{bt}** — Бюджетная версия (каркас {bt}40×40 мм{bt}, утеплитель Техноплекс {bt}30 мм{bt} как в видео {bt}7PO74wVwbDE{bt}, снаружи влагостойкая ОСБ-3 {bt}9 мм{bt} под покраску + наличник ТЗСИ, кровля рубероид РКПО-350): **{bt}302,99 BYN{bt}** (экономия **100 BYN**).",
+        f"> * Ветка **{bt}budget-30mm{bt}** — Бюджетная версия (каркас {bt}40×40 мм{bt}, утеплитель Техноплекс {bt}30 мм{bt} как в видео {bt}7PO74wVwbDE{bt}, снаружи тоже деревянная вагонка + наличник ТЗСИ, кровля рубероид РКПО-350): **{bt}350,70 BYN{bt}**.",
         "",
         "---",
         "",
