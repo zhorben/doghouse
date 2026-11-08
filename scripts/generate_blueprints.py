@@ -48,7 +48,7 @@ def create_blueprint_sheet(title_text, subtitle_text, sheet_number):
     canvas.text((45, 32), title_text, font=bold_font(30), fill=(255, 255, 255))
     canvas.text((45, 75), subtitle_text, font=regular_font(20), fill=(200, 220, 245))
     canvas.rectangle([width - 235, 32, width - 35, 103], fill=(255, 205, 70), outline=INK_COLOR, width=2)
-    canvas.text((width - 215, 50), f"ЛИСТ {sheet_number} из 4", font=bold_font(25), fill=INK_COLOR)
+    canvas.text((width - 215, 50), f"ЛИСТ {sheet_number} из 5", font=bold_font(25), fill=INK_COLOR)
     return sheet_image, canvas
 
 def draw_dimension_arrow(canvas, start_x, start_y, end_x, end_y, label_text, normal_x, normal_y, offset_distance=40, color=DIMENSION_BLUE, font_size=18):
@@ -442,7 +442,11 @@ def generate_sheet_three():
         (side_x + side_w, side_bottom_y - side_front_h + beam_px),
         (side_x, side_bottom_y - side_back_h + beam_px)
     ], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
-    canvas.text((side_x + 75, side_bottom_y - side_front_h - 38), "Б-5 (верхний наклонный): 757 мм", font=bold_font(17), fill=DIMENSION_BLUE)
+    canvas.text((side_x + 35, side_bottom_y - side_front_h - 56), "Б-5 (наклон 7,6°): 757 мм (торцы 82,4° / 97,6°)", font=bold_font(17), fill=DIMENSION_BLUE)
+    canvas.text((side_x + 8, side_bottom_y - side_back_h - 26), "97,6°", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((side_x + side_w - 52, side_bottom_y - side_front_h - 26), "82,4°", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((side_x + 8, side_bottom_y - beam_px - 24), "90°", font=bold_font(15), fill=ACCENT_GREEN)
+    canvas.text((side_x + side_w - 42, side_bottom_y - beam_px - 24), "90°", font=bold_font(15), fill=ACCENT_GREEN)
 
     for screw_x, top_screw_y in [
         (side_x + beam_px // 2, side_bottom_y - side_back_h + beam_px // 2),
@@ -694,17 +698,168 @@ def generate_sheet_four():
     sheet_image.save(os.path.join(PLANS_OUTPUT_DIR, "04_cutlist_plywood_and_penoplex.png"))
     return sheet_image
 
+
+def generate_sheet_five():
+    sheet_image, canvas = create_blueprint_sheet(
+        "КАРТА ВСЕХ УГЛОВ РЕЗА (В ГРАДУСАХ И МИЛЛИМЕТРАХ) + УЗЛЫ СТЫКОВКИ УГЛОВ",
+        "Какие детали пилятся строго под 90°, а где делается скос 7,6° (82,4° / 97,6°) по обычной рулетке без транспортира",
+        5
+    )
+
+    canvas.rectangle([45, 135, 975, 715], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((65, 150), "1. КАК РАЗМЕТИТЬ СКОС 7,6° (УГОЛ 82,4°) БЕЗ ТРАНСПОРТИРА:", font=bold_font(20), fill=DIMENSION_BLUE)
+    canvas.text((65, 182), "На ширине бруса 50 мм угол 7,6° — это сдвиг ровно на 7 мм по рулетке!", font=bold_font(16), fill=FASTENER_RED)
+
+    bx_base, by_base = 115, 625
+    stud_defs = [
+        ("Стойка Б-3 (задняя)", 543, 550, 0),
+        ("Стойка Б-4 (средняя)", 593, 600, 260),
+        ("Стойка Б-2 (передняя)", 643, 650, 520)
+    ]
+    for title_s, h_left, h_right, x_off in stud_defs:
+        sx0 = bx_base + x_off
+        w_b = 110
+        h_l_px = int(h_left * 0.48)
+        h_r_px = int(h_right * 0.48)
+        y_top_l = by_base - h_l_px
+        y_top_r = by_base - h_r_px - 22
+        canvas.polygon([
+            (sx0, by_base),
+            (sx0 + w_b, by_base),
+            (sx0 + w_b, y_top_r),
+            (sx0, y_top_l)
+        ], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+        canvas.line([(sx0, y_top_r), (sx0 + w_b, y_top_r)], fill=FASTENER_RED, width=2)
+        canvas.text((sx0 - 15, by_base + 12), title_s, font=bold_font(15), fill=INK_COLOR)
+        canvas.text((sx0 - 15, by_base + 34), f"Слева {h_left} / Справа {h_right} мм", font=mono_font(14), fill=DIMENSION_BLUE)
+        canvas.text((sx0 + 10, by_base - 26), "90°", font=bold_font(15), fill=ACCENT_GREEN)
+        canvas.text((sx0 + w_b - 38, by_base - 26), "90°", font=bold_font(15), fill=ACCENT_GREEN)
+        canvas.text((sx0 + 8, y_top_l + 6), "97,6°", font=bold_font(15), fill=FASTENER_RED)
+        canvas.text((sx0 + w_b - 52, y_top_r + 14), "82,4°", font=bold_font(15), fill=FASTENER_RED)
+        canvas.text((sx0 + 6, y_top_r - 22), "Отступ 7 мм", font=bold_font(14), fill=FASTENER_RED)
+        canvas.text((sx0 + 22, by_base - h_l_px // 2), "50 мм", font=bold_font(15), fill=INK_COLOR)
+
+    canvas.rectangle([1015, 135, 1955, 715], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((1035, 150), "2. ВЕРХНИЙ НАКЛОННЫЙ БРУС Б-5 И ТРАПЕЦИЯ ФАНЕРЫ БОКОВИНЫ:", font=bold_font(20), fill=DIMENSION_BLUE)
+    canvas.text((1035, 182), "Как выглядят углы на брусе Б-5 (2 шт.) и на боковом листе фанеры 4 мм (2 шт.):", font=regular_font(16), fill=INK_COLOR)
+
+    b5_x1, b5_y1 = 1090, 310
+    b5_x2, b5_y2 = 1850, 235
+    b5_h = 56
+    canvas.polygon([
+        (b5_x1, b5_y1),
+        (b5_x2, b5_y2),
+        (b5_x2, b5_y2 + b5_h),
+        (b5_x1, b5_y1 + b5_h)
+    ], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((b5_x1 + 180, b5_y2 - 28), "Брус Б-5: длина 757 мм (наклон 7,6°)", font=bold_font(17), fill=INK_COLOR)
+    canvas.text((b5_x1 + 10, b5_y1 + 6), "97,6°", font=bold_font(15), fill=FASTENER_RED)
+    canvas.text((b5_x1 + 10, b5_y1 + b5_h - 22), "82,4°", font=bold_font(15), fill=FASTENER_RED)
+    canvas.text((b5_x2 - 55, b5_y2 + 6), "82,4°", font=bold_font(15), fill=FASTENER_RED)
+    canvas.text((b5_x2 - 55, b5_y2 + b5_h - 22), "97,6°", font=bold_font(15), fill=FASTENER_RED)
+    canvas.text((b5_x1 - 10, b5_y1 + b5_h + 10), "Сдвиг торца по линейке = 7 мм (или отпилить прямо по месту!)", font=bold_font(15), fill=DIMENSION_BLUE)
+
+    tr_x, tr_y_bot = 1140, 680
+    tr_w = 420
+    tr_h_l = 210
+    tr_h_r = 250
+    canvas.polygon([
+        (tr_x, tr_y_bot),
+        (tr_x + tr_w, tr_y_bot),
+        (tr_x + tr_w, tr_y_bot - tr_h_r),
+        (tr_x, tr_y_bot - tr_h_l)
+    ], fill=PLYWOOD_FILL, outline=INK_COLOR, width=3)
+    canvas.text((tr_x + 70, tr_y_bot - 135), "Боковой лист фанеры 4 мм (2 шт.)", font=bold_font(16), fill=INK_COLOR)
+    canvas.text((tr_x + 70, tr_y_bot - 108), "Нижние углы: строго 90° и 90°", font=regular_font(15), fill=ACCENT_GREEN)
+    canvas.text((tr_x + 70, tr_y_bot - 84), "Верхние углы: 97,6° и 82,4°", font=regular_font(15), fill=FASTENER_RED)
+    canvas.text((tr_x + 12, tr_y_bot - 26), "90°", font=bold_font(16), fill=ACCENT_GREEN)
+    canvas.text((tr_x + tr_w - 42, tr_y_bot - 26), "90°", font=bold_font(16), fill=ACCENT_GREEN)
+    canvas.text((tr_x + 12, tr_y_bot - tr_h_l + 8), "97,6°", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((tr_x + tr_w - 55, tr_y_bot - tr_h_r + 12), "82,4°", font=bold_font(16), fill=FASTENER_RED)
+    canvas.text((tr_x - 85, tr_y_bot - tr_h_l // 2), "650 мм", font=mono_font(16), fill=DIMENSION_BLUE)
+    canvas.text((tr_x + tr_w + 12, tr_y_bot - tr_h_r // 2), "750 мм", font=mono_font(16), fill=DIMENSION_BLUE)
+    canvas.text((tr_x + tr_w // 2 - 40, tr_y_bot + 8), "750 мм", font=mono_font(16), fill=DIMENSION_BLUE)
+
+    canvas.rectangle([45, 745, 975, 1360], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((65, 762), "3. УЗЕЛ СТЫКОВКИ УГЛА БУДКИ (ВИД СВЕРХУ КРУПНО — ВСЕ УГЛЫ 90°):", font=bold_font(19), fill=DIMENSION_BLUE)
+    canvas.text((65, 792), "Как соединяются в углу брус, фанера, вагонка и 2 планки наличника 13×74 мм:", font=regular_font(16), fill=INK_COLOR)
+
+    cx, cy = 260, 930
+    s_u = 2.4
+    b_u = int(50 * s_u)
+    p_u = int(10 * s_u)
+    p4_u = int(4 * s_u)
+    v_u = int(16 * s_u)
+    n_t = int(13 * s_u)
+    n_w = int(74 * s_u)
+
+    canvas.rectangle([cx, cy, cx + 380, cy + b_u], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([cx, cy, cx + b_u, cy + b_u], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((cx + 8, cy + 28), "Стойка П-2\n(50×50 мм)\nУгол 90°", font=bold_font(14), fill=INK_COLOR)
+
+    canvas.rectangle([cx, cy + b_u, cx + b_u, cy + 340], fill=PENOPLEX_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([cx, cy + b_u, cx + b_u, cy + b_u * 2], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((cx + 8, cy + b_u + 28), "Стойка Б-2\n(50×50 мм)\nУгол 90°", font=bold_font(14), fill=INK_COLOR)
+
+    canvas.line([(cx + b_u - 16, cy - 18), (cx + b_u - 16, cy + b_u + 65)], fill=FASTENER_RED, width=5)
+    canvas.text((cx + b_u + 15, cy + 12), "Саморез 4,5×90 мм (стягивает 2 стены под 90°)", font=bold_font(15), fill=FASTENER_RED)
+
+    canvas.rectangle([cx + b_u, cy + b_u, cx + 380, cy + b_u + p4_u], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([cx + b_u, cy + b_u + p4_u, cx + b_u + p4_u, cy + 340], fill=PLYWOOD_FILL, outline=INK_COLOR, width=2)
+    canvas.text((cx + b_u + 30, cy + b_u + 18), "Внутренняя фанера 4 мм (стык в углу под 90°)", font=bold_font(15), fill=ACCENT_GREEN)
+
+    canvas.rectangle([cx - v_u, cy - v_u, cx + 380, cy], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
+    canvas.rectangle([cx - v_u, cy, cx, cy + 340], fill=VAGONKA_FILL, outline=INK_COLOR, width=2)
+    canvas.text((cx + 160, cy - v_u + 8), "Вагонка 16 мм снаружи", font=bold_font(14), fill=INK_COLOR)
+
+    canvas.rectangle([cx - v_u - n_t, cy - v_u - n_t, cx - v_u - n_t + n_w, cy - v_u], fill=TIMBER_FILL, outline=FASTENER_RED, width=3)
+    canvas.rectangle([cx - v_u - n_t, cy - v_u, cx - v_u, cy - v_u + n_w - n_t], fill=TIMBER_FILL, outline=FASTENER_RED, width=3)
+    canvas.text((cx - v_u - n_t, cy - v_u - n_t - 26), "2 планки наличника 13×74 мм (сбиваются буквой Г под 90°)", font=bold_font(15), fill=FASTENER_RED)
+
+    canvas.rectangle([1015, 745, 1955, 1360], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((1035, 762), "4. ПОЛНАЯ ТАБЛИЦА ВСЕХ УГЛОВ РЕЗА ПО КАЖДОЙ ДЕТАЛИ:", font=bold_font(20), fill=DIMENSION_BLUE)
+
+    angle_summary = [
+        "• 30 из 38 брусков каркаса пилятся СТРОГО ПОД ПРЯМЫМ УГЛОМ 90°:",
+        "  - Рама пола и цоколь: Д-1 (2 шт.), Д-2 (4 шт.), Ц-1 (2 шт.), Ц-2 (3 шт.) -> все торцы 90°.",
+        "  - Передняя стенка: П-1 (2 шт.), П-2 (5 шт.), П-3 (1 шт.) -> все торцы 90°.",
+        "  - Задняя стенка: З-1 (2 шт.), З-2 (4 шт.) -> все торцы 90°.",
+        "  - Нижний брус боковин Б-1 (2 шт.) и вся рамка крыши К-1 (2 шт.), К-2 (4 шт.) -> все торцы 90°.",
+        "",
+        "• ТОЛЬКО 8 ДЕТАЛЕЙ БРУСА ИМЕЮТ СКОС 7,6° (УГОЛ 82,4° / 97,6°, ОТСТУП 7 ММ):",
+        "  - Стойки боковин Б-2 (2 шт., 643..650 мм), Б-4 (2 шт., 593..600 мм), Б-3 (2 шт., 543..550 мм):",
+        "    нижний торец пилится под 90°, а верхний торец — под 82,4° (сдвиг 7 мм на ширину 50 мм).",
+        "  - Верхний наклонный брус боковин Б-5 (2 шт., длина 757 мм): оба торца под 82,4° / 97,6°.",
+        "",
+        "• ЛИСТОВЫЕ МАТЕРИАЛЫ (ФАНЕРА И ОСБ-3):",
+        "  - Чистовой пол, черновой пол, передняя стенка, задняя стенка, оба листа крыши -> все углы 90°.",
+        "  - Боковые стенки внутри (2 шт., фанера 4 мм): снизу углы 90°, сверху скос 82,4° / 97,6°.",
+        "",
+        "• НАЛИЧНИК 13×74 ММ НА УГЛЫ И РАМКУ ЛАЗА:",
+        "  - На 4 углах будки: скручивается внахлест под 90°, верхний торец под крышей срезается на 7,6°.",
+        "  - Вокруг окна лаза (350×450 мм): углы рамки запиливаются под 45° (как наличник двери) или 90°."
+    ]
+    ay = 802
+    for line in angle_summary:
+        is_hdr = line.startswith("•")
+        canvas.text((1035, ay), line, font=bold_font(16) if is_hdr else regular_font(15), fill=FASTENER_RED if "ТОЛЬКО 8" in line else (INK_COLOR if not is_hdr else DIMENSION_BLUE))
+        ay += 30
+
+    sheet_image.save(os.path.join(PLANS_OUTPUT_DIR, "05_angles_and_corner_joints.png"))
+    return sheet_image
+
 def generate_all():
     sheet_one = generate_sheet_one()
     sheet_two = generate_sheet_two()
     sheet_three = generate_sheet_three()
     sheet_four = generate_sheet_four()
+    sheet_five = generate_sheet_five()
     sheet_one.save(
         os.path.join(PLANS_OUTPUT_DIR, "doghouse_blueprints_telekhany.pdf"),
         "PDF",
         resolution=150.0,
         save_all=True,
-        append_images=[sheet_two, sheet_three, sheet_four]
+        append_images=[sheet_two, sheet_three, sheet_four, sheet_five]
     )
 
 if __name__ == "__main__":

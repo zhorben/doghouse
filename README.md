@@ -24,14 +24,14 @@
 
 ## Структура проекта
 
-* [`plans/doghouse_blueprints_telekhany.pdf`](./plans/doghouse_blueprints_telekhany.pdf) — **многостраничный PDF со всеми 4 листами чертежей** (удобно открыть на Mac или распечатать).
-* `plans/01_...png` – `04_...png` — отдельные листы чертежей в высоком разрешении (`2000 × 1400 px`).
+* [`plans/doghouse_blueprints_telekhany.pdf`](./plans/doghouse_blueprints_telekhany.pdf) — **многостраничный PDF со всеми 5 листами чертежей** (удобно открыть на Mac или распечатать).
+* `plans/01_...png` – `05_...png` — отдельные листы чертежей в высоком разрешении (`2000 × 1400 px`).
 * [`viewer/index.html`](./viewer/index.html) — **интерактивная 3D-модель будки** (открывается двойным кликом в любом браузере на Mac: можно крутить мышкой, поднимать/опускать крышу ползунком и включать/выключать слои).
 * [`scripts/generate_blueprints.py`](./scripts/generate_blueprints.py) — Python-скрипт генератора чертежей (`python3 scripts/generate_blueprints.py`).
 
 ---
 
-## Чертежи (4 листа)
+## Чертежи (5 листов)
 
 ### Лист 1. Общий вид, план сверху (с сеткой от подкопа и 6 плитками) и боковой разрез
 ![Лист 1](./plans/01_general_view_and_layers.png)
@@ -44,6 +44,9 @@
 
 ### Лист 4. Карта раскроя (1 лист фанеры 10 мм + 2 листа 4 мм + 1 лист ОСБ-3 + 12 брусков) и смета
 ![Лист 4](./plans/04_cutlist_plywood_and_penoplex.png)
+
+### Лист 5. Карта всех углов реза (в градусах и миллиметрах) + узлы стыковки углов
+![Лист 5](./plans/05_angles_and_corner_joints.png)
 
 ---
 
