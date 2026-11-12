@@ -314,7 +314,7 @@ def create_blueprint_sheet(title_text, subtitle_text, sheet_number):
     canvas.text((45, 32), title_text, font=bold_font(29), fill=(255, 255, 255))
     canvas.text((45, 75), subtitle_text, font=regular_font(19), fill=(200, 220, 245))
     canvas.rectangle([width - 235, 32, width - 35, 103], fill=(255, 205, 70), outline=INK_COLOR, width=2)
-    canvas.text((width - 215, 50), f"ЛИСТ {sheet_number} из 5", font=bold_font(25), fill=INK_COLOR)
+    canvas.text((width - 215, 50), f"ЛИСТ {sheet_number} из 6", font=bold_font(25), fill=INK_COLOR)
     return sheet_image, canvas
 
 
@@ -352,6 +352,189 @@ def draw_dimension_arrow(canvas, start_x, start_y, end_x, end_y, label_text, nor
 
 def draw_screw_point(canvas, center_x, center_y, radius=7):
     canvas.ellipse([center_x - radius, center_y - radius, center_x + radius, center_y + radius], fill=FASTENER_RED, outline=(255, 255, 255), width=2)
+
+
+def generate_sheet_six(m):
+    B = m["beam_size"]
+    FL = m["frame_length"]
+    FW = m["frame_width"]
+    IW = m["interior_frame_width"]
+    diag_floor = round(math.hypot(FL, FW))
+    cell_w = m["floor_cell_widths"][0]
+    screw_main = "4,5×75 мм" if m["is_budget"] else "4,5×90 мм"
+
+    sheet_image, canvas = create_blueprint_sheet(
+        f"ШПАРГАЛКА НОВИЧКА: КАК ИМЕННО СКЛАДЫВАТЬ И СКРУЧИВАТЬ БРУСКИ {B}×{B} ММ",
+        "Два вида стыка (угловой «Г» и перемычка «Т»), разметка 2 дырочек под саморезы и сборка первой рамки за 5 шагов",
+        6
+    )
+
+    canvas.rectangle([45, 135, 965, 700], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((65, 150), "1. ДВА ВИДА СТЫКА В РАМКЕ: УГОЛ «Г» И ПЕРЕМЫЧКА «Т»", font=bold_font(19), fill=DIMENSION_BLUE)
+    canvas.text((65, 180), "Длинный брус Д-1 накрывает торцы коротких брусков Д-2 сверху!", font=bold_font(16), fill=FASTENER_RED)
+
+    bx, by = 110, 290
+    beam_w = 780
+    beam_h = 82
+
+    canvas.rectangle([bx, by, bx + beam_w, by + beam_h], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((bx + 210, by + 28), f"Длинный брус Д-1 ({FL} мм)", font=bold_font(19), fill=INK_COLOR)
+
+    canvas.rectangle([bx, by + beam_h, bx + beam_h, by + beam_h + 265], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((bx + 8, by + beam_h + 80), f"Крайний\nбрус Д-2\n({IW} мм)", font=bold_font(14), fill=INK_COLOR)
+
+    canvas.line([(bx - 20, by), (bx - 20, by + beam_h + 130)], fill=ACCENT_GREEN, width=3)
+    canvas.text((bx + beam_h + 14, by + beam_h + 18), "1) УГОЛ РАМКИ (буква «Г»):", font=bold_font(16), fill=ACCENT_GREEN)
+    canvas.text((bx + beam_h + 14, by + beam_h + 44), "Края брусков ВРОВЕНЬ", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((bx + beam_h + 14, by + beam_h + 66), "(проведите пальцем сбоку —", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((bx + beam_h + 14, by + beam_h + 88), "ступеньки быть не должно!)", font=regular_font(15), fill=INK_COLOR)
+
+    mx = bx + 445
+    canvas.rectangle([mx, by + beam_h, mx + beam_h, by + beam_h + 265], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=3)
+    canvas.text((mx + 8, by + beam_h + 80), f"Средний\nбрус Д-2\n({IW} мм)", font=bold_font(14), fill=INK_COLOR)
+    canvas.text((mx + beam_h + 14, by + beam_h + 18), "2) ПЕРЕМЫЧКА (буква «Т»):", font=bold_font(16), fill=DIMENSION_BLUE)
+    canvas.text((mx + beam_h + 14, by + beam_h + 44), f"Отмерили {cell_w} мм от угла,", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((mx + beam_h + 14, by + beam_h + 66), "провели черту карандашом", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((mx + beam_h + 14, by + beam_h + 88), "и приставили брус к черте!", font=regular_font(15), fill=INK_COLOR)
+
+    canvas.line([(mx, by), (mx, by + beam_h + 25)], fill=ACCENT_GREEN, width=4)
+    canvas.text((mx - 45, by - 26), f"Черта карандашом ({cell_w} мм)", font=bold_font(14), fill=ACCENT_GREEN)
+
+    for jx in [bx, mx]:
+        for dx_s in [23, 59]:
+            sx = jx + dx_s
+            canvas.line([(sx, by - 26), (sx, by + beam_h + 72)], fill=FASTENER_RED, width=5)
+            canvas.rectangle([sx - 8, by - 30, sx + 8, by - 24], fill=FASTENER_RED, outline=INK_COLOR, width=1)
+
+    canvas.text((bx, by - 64), f"В каждый торец крутим по 2 самореза {screw_main} сверху насквозь!", font=bold_font(15), fill=FASTENER_RED)
+
+    canvas.rectangle([1005, 135, 1955, 700], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((1025, 150), f"2. КУДА ИМЕННО СВЕРЛИТЬ (ВИД НА ГРАНЬ БРУСА {B}×{B} ММ):", font=bold_font(19), fill=DIMENSION_BLUE)
+    canvas.text((1025, 180), "Ставим 2 точки по диагонали (по 15 мм от краев), чтобы шурупы не столкнулись:", font=regular_font(15), fill=INK_COLOR)
+
+    gx, gy = 1065, 265
+    gw = 460
+    gh = 155
+    canvas.rectangle([gx + 155, gy, gx + 155 + gh, gy + gh], fill=(248, 238, 220), outline=INK_COLOR, width=2)
+    canvas.rectangle([gx, gy, gx + gw, gy + gh], fill=TIMBER_FILL, outline=INK_COLOR, width=3)
+    for yy in range(gy, gy + gh, 14):
+        canvas.line([(gx + 155, yy), (gx + 155, min(yy + 8, gy + gh))], fill=DIMENSION_BLUE, width=3)
+        canvas.line([(gx + 155 + gh, yy), (gx + 155 + gh, min(yy + 8, gy + gh))], fill=DIMENSION_BLUE, width=3)
+
+    canvas.text((gx + 15, gy + 55), "Брус Д-1\n(сверху)", font=bold_font(16), fill=INK_COLOR)
+    canvas.text((gx + 95, gy + gh + 14), f"Пунктир — торец бруса Д-2 снизу (квадрат {B}×{B} мм)", font=bold_font(15), fill=DIMENSION_BLUE)
+
+    p1x, p1y = gx + 155 + 46, gy + 46
+    p2x, p2y = gx + 155 + gh - 46, gy + gh - 46
+    for px, py in [(p1x, p1y), (p2x, p2y)]:
+        canvas.ellipse([px - 10, py - 10, px + 10, py + 10], fill=FASTENER_RED, outline=(255, 255, 255), width=2)
+
+    canvas.line([(p1x + 12, p1y), (gx + gw + 15, p1y)], fill=FASTENER_RED, width=2)
+    canvas.line([(p2x + 12, p2y), (gx + gw + 15, p2y)], fill=FASTENER_RED, width=2)
+    canvas.text((gx + gw + 22, p1y - 12), "Дырочка №1 (сверло 3,5–4 мм)", font=bold_font(15), fill=FASTENER_RED)
+    canvas.text((gx + gw + 22, p2y - 12), "Дырочка №2 (после диагоналей!)", font=bold_font(15), fill=FASTENER_RED)
+
+    canvas.text((1025, 495), "ПОЧЕМУ СНАЧАЛА КРУТИМ 1-Й САМОРЕЗ, А ПОТОМ МЕРЯЕМ ДИАГОНАЛИ:", font=bold_font(16), fill=ACCENT_GREEN)
+    canvas.text((1025, 526), "• Пока в каждом из 4 углов закручено только по 1 саморезу, он работает как", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((1025, 552), f"  шарнир — рамку легко чуть-чуть подтолкнуть рукой, чтобы обе диагонали", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((1025, 578), f"  накрест стали абсолютно одинаковыми ({diag_floor} мм и {diag_floor} мм)!", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((1025, 608), "• Как только диагонали совпали — сверлим дырочку №2 и закручиваем второй", font=regular_font(15), fill=INK_COLOR)
+    canvas.text((1025, 634), "  саморез в каждый угол: теперь углы 90° заблокированы намертво!", font=regular_font(15), fill=INK_COLOR)
+
+    canvas.rectangle([45, 725, 1955, 1360], fill=(255, 255, 255), outline=INK_COLOR, width=3)
+    canvas.text((65, 742), "3. ПОШАГОВЫЙ КОМИКС: КАК ВЫ СОБИРАЕТЕ ПЕРВУЮ РАМКУ ПОЛА ЗА 5 ПРОСТЫХ ШАГОВ", font=bold_font(21), fill=DIMENSION_BLUE)
+
+    steps_comic = [
+        ("ШАГ А: Сложили коробку", [
+            f"Кладем на лист ОСБ 2 длинных",
+            f"бруса Д-1 ({FL}) и между ними",
+            f"по краям 2 коротких Д-2 ({IW}).",
+            "На всех 4 углах ровняем края",
+            "пальцем вровень (буква «Г»)."
+        ]),
+        ("ШАГ Б: По 1 шурупу в угол", [
+            "В каждом из 4 углов сверлим",
+            "1 дырочку сквозь Д-1, наживляем",
+            f"саморез {screw_main}, дедушка",
+            "прижимает угол ногой —",
+            "стягиваем 4 угла по 1 шурупу."
+        ]),
+        ("ШАГ В: Ровняем диагонали", [
+            "Меряем рулеткой накрест от",
+            "угла до угла. Должно быть",
+            f"{diag_floor} мм и {diag_floor} мм. Если одна",
+            "длиннее — легко толкаем этот",
+            "угол рукой, пока не совпадут!"
+        ]),
+        ("ШАГ Г: 2-й шуруп в углы", [
+            "Когда диагонали равны, сверлим",
+            "и крутим в каждый из 4 углов",
+            f"ВТОРОЙ саморез {screw_main}",
+            "по диагонали от первого.",
+            "Углы 90° зажаты намертво!"
+        ]),
+        ("ШАГ Д: Ставим перемычки", [
+            "Отмеряем рулеткой от углов",
+            f"по {cell_w} мм внутрь, ставим черту,",
+            "вставляем 2 средних бруса Д-2",
+            "(вот тут стык буквой «Т»!) и",
+            "прикручиваем их по 2 шурупа."
+        ])
+    ]
+
+    for idx, (st_title, st_lines) in enumerate(steps_comic):
+        cx0 = 65 + idx * 376
+        cy0 = 790
+        canvas.rectangle([cx0, cy0, cx0 + 358, cy0 + 545], fill=(248, 250, 253), outline=DIMENSION_BLUE, width=2)
+        canvas.rectangle([cx0, cy0, cx0 + 358, cy0 + 48], fill=DIMENSION_BLUE)
+        canvas.text((cx0 + 14, cy0 + 12), st_title, font=bold_font(17), fill=(255, 255, 255))
+
+        ix, iy = cx0 + 50, cy0 + 72
+        iw, ih = 258, 165
+        if idx == 0:
+            canvas.rectangle([ix, iy, ix + iw, iy + 22], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + ih - 22, ix + iw, iy + ih], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + 22, ix + 22, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix + iw - 22, iy + 22, ix + iw, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+        elif idx == 1:
+            canvas.rectangle([ix, iy, ix + iw, iy + 22], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + ih - 22, ix + iw, iy + ih], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + 22, ix + 22, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix + iw - 22, iy + 22, ix + iw, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+            for sx_i, sy_i in [(ix + 11, iy + 11), (ix + iw - 11, iy + 11), (ix + 11, iy + ih - 11), (ix + iw - 11, iy + ih - 11)]:
+                canvas.ellipse([sx_i - 5, sy_i - 5, sx_i + 5, sy_i + 5], fill=FASTENER_RED)
+        elif idx == 2:
+            canvas.rectangle([ix, iy, ix + iw, iy + ih], outline=INK_COLOR, width=3)
+            canvas.line([(ix, iy), (ix + iw, iy + ih)], fill=ACCENT_GREEN, width=3)
+            canvas.line([(ix + iw, iy), (ix, iy + ih)], fill=ACCENT_GREEN, width=3)
+            canvas.text((ix + 65, iy + ih // 2 - 12), f"{diag_floor} = {diag_floor}", font=bold_font(17), fill=ACCENT_GREEN)
+        elif idx == 3:
+            canvas.rectangle([ix, iy, ix + iw, iy + 22], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + ih - 22, ix + iw, iy + ih], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + 22, ix + 22, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix + iw - 22, iy + 22, ix + iw, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+            for sx_i, sy_i in [
+                (ix + 7, iy + 7), (ix + 15, iy + 15),
+                (ix + iw - 15, iy + 7), (ix + iw - 7, iy + 15),
+                (ix + 7, iy + ih - 15), (ix + 15, iy + ih - 7),
+                (ix + iw - 15, iy + ih - 15), (ix + iw - 7, iy + ih - 7)
+            ]:
+                canvas.ellipse([sx_i - 4, sy_i - 4, sx_i + 4, sy_i + 4], fill=FASTENER_RED)
+        elif idx == 4:
+            canvas.rectangle([ix, iy, ix + iw, iy + 22], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            canvas.rectangle([ix, iy + ih - 22, ix + iw, iy + ih], fill=TIMBER_FILL, outline=INK_COLOR, width=2)
+            for bx_i in [0, 82, 158, iw - 22]:
+                canvas.rectangle([ix + bx_i, iy + 22, ix + bx_i + 22, iy + ih - 22], fill=PLINTH_TIMBER_FILL, outline=INK_COLOR, width=2)
+                canvas.ellipse([ix + bx_i + 7, iy + 7, ix + bx_i + 15, iy + 15], fill=FASTENER_RED)
+                canvas.ellipse([ix + bx_i + 7, iy + ih - 15, ix + bx_i + 15, iy + ih - 7], fill=FASTENER_RED)
+
+        ty = cy0 + 265
+        for tl in st_lines:
+            canvas.text((cx0 + 16, ty), tl, font=regular_font(16), fill=INK_COLOR)
+            ty += 36
+
+    sheet_image.save(os.path.join(PLANS_OUTPUT_DIR, "06_beginner_screwing_guide.png"))
+    return sheet_image
 
 
 def render_all_sheets_and_readme(m):
@@ -1046,7 +1229,7 @@ def render_all_sheets_and_readme(m):
         "PDF",
         resolution=150.0,
         save_all=True,
-        append_images=[s2_img, s3_img, s4_img, s5_img]
+        append_images=[s2_img, s3_img, s4_img, s5_img, generate_sheet_six(m)]
     )
 
     with open(os.path.join(PLANS_OUTPUT_DIR, "calculations_verified.json"), "w", encoding="utf-8") as jf:
@@ -1096,7 +1279,7 @@ def generate_readme_markdown(m):
         "",
         "---",
         "",
-        "## Чертежи (5 листов)",
+        "## Чертежи (6 листов)",
         "",
         "### Лист 1. Общий вид, план сверху и боковой разрез",
         "![Лист 1](./plans/01_general_view_and_layers.png)",
@@ -1112,6 +1295,9 @@ def generate_readme_markdown(m):
         "",
         "### Лист 5. Карта всех углов реза (в градусах и миллиметрах) + узел стыковки угла",
         "![Лист 5](./plans/05_angles_and_corner_joints.png)",
+        "",
+        "### Лист 6. Шпаргалка новичка: как складывать и скручивать бруски (стыки «Г» и «Т»)",
+        "![Лист 6](./plans/06_beginner_screwing_guide.png)",
         "",
         "---",
         "",
